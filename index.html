@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sun and Rain in the UK</title>
+<meta name="description" content="An interactive 1 km map of the UK's sunshine against its rainfall from Met Office HadUK-Grid normals: sunny and dry, dull and wet, then and now, and your own square.">
+<meta property="og:title" content="Sun and rain: the UK's sunshine against its rainfall">
+<meta property="og:description" content="Every square kilometre of the UK by sunshine and rainfall, 1991 to 2020: from 1,992 hours of sun at Dungeness to 784 on Ben Nevis. The UK is 5.6% sunnier than in 1961 to 1990.">
+<meta property="og:image" content="https://tristan-hotham.github.io/sun-and-rain-uk/header.png">
+<meta property="og:url" content="https://tristan-hotham.github.io/sun-and-rain-uk/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800;9..144,900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Paper, marigold and teal. The four corners of the bivariate palette: dull and dry (pale), sunny and dry (marigold),
+   dull and wet (teal), sunny and wet (aubergine). */
+:root{
+  --bg:#F7F4EC; --panel:#EEE9DD; --fg:#1E1B22; --muted:#665F68; --rule:#DED7C8; --card:#FCFAF5; --border:#CFC6B4;
+  --sun:#D97A16; --rain:#24808A; --plum:#3E1C47; --hot:#C2410C; --sea:#E4E9EA; --ctx:#EEEAE1;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17151A; --panel:#221F25; --fg:#EEEAF0; --muted:#A79FAA; --rule:#36313A; --card:#211E24; --border:#4A4450;
+  --sun:#F29A3D; --rain:#56B3BC; --plum:#C9A2D6; --hot:#F2894A; --sea:#1D2226; --ctx:#2B2830; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17151A; --panel:#221F25; --fg:#EEEAF0; --muted:#A79FAA; --rule:#36313A; --card:#211E24; --border:#4A4450;
+  --sun:#F29A3D; --rain:#56B3BC; --plum:#C9A2D6; --hot:#F2894A; --sea:#1D2226; --ctx:#2B2830; color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 18px/1.62 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));overflow-x:hidden}
+.wrap{max-width:680px;margin:0 auto;padding-block:28px 64px}
+.wrap .bleed{width:min(1120px,calc(100vw - 32px));margin-left:calc((100% - min(1120px,100vw - 32px))/2);margin-right:0}
+a{color:inherit;text-decoration-color:var(--sun);text-underline-offset:3px}
+.kicker{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.kicker b{background:var(--plum);color:#fff;padding:5px 8px;font-weight:500}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kicker b{color:#17151A}}
+:root[data-theme="dark"] .kicker b{color:#17151A}
+header.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:end;border-bottom:6px double var(--fg);padding-bottom:22px;margin-top:18px}
+h1{font:900 clamp(46px,11.5vw,98px)/.9 var(--display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 .s{color:var(--sun)} h1 .r{color:var(--rain)}
+.mark{width:clamp(78px,17vw,132px);height:auto;display:block}
+.dek{grid-column:1/-1;font-size:21px;line-height:1.42;margin:8px 0 0;max-width:48ch}
+.byline{font:400 13px/1.4 var(--mono);color:var(--muted);margin-top:14px}
+h2{font:800 34px/1.04 var(--display);letter-spacing:-.01em;margin:52px 0 10px;text-wrap:balance}
+h2 .n{font:500 13px/1 var(--mono);color:var(--sun);display:block;letter-spacing:.1em;margin-bottom:10px}
+h3{font:600 20px/1.25 var(--display);margin:28px 0 6px}
+p{margin:0 0 16px}
+.lede::first-letter{font:900 72px/.8 var(--display);float:left;margin:6px 10px 0 0;color:var(--sun)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:26px 0 8px}
+.stats div{background:var(--card);padding:14px 12px}
+.stats b{display:block;font:900 clamp(26px,5.6vw,38px)/1 var(--display);color:var(--fg)}
+.stats b.s{color:var(--sun)} .stats b.r{color:var(--rain)}
+.stats span{font:400 12px/1.35 var(--mono);color:var(--muted);display:block;margin-top:6px}
+@media (max-width:600px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.figure{margin:26px 0 30px}
+.fig-h{font:600 19px/1.25 var(--display);margin:0 0 4px}
+.fig-sub{font:400 13px/1.45 var(--mono);color:var(--muted);margin:0 0 12px}
+.src{font:400 12px/1.45 var(--mono);color:var(--muted);margin-top:10px}
+.chart{width:100%;position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--mono);fill:var(--fg)}
+.lab{font-size:12px}.lab.m{fill:var(--muted)}.lab.b{font-weight:500}.lab.s{font-size:11px}
+.tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);font:400 12px/1.45 var(--mono);padding:8px 10px;border-radius:3px;max-width:280px;z-index:1000;transform:translate(-50%,calc(-100% - 12px));display:none}
+.tip b{font-weight:500}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 10px}
+.controls label.l{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.btn{font:500 12px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:8px 10px;cursor:pointer;min-height:36px}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;max-width:100%;flex-wrap:wrap}
+.seg .btn{border:0;border-radius:0;border-right:1px solid var(--border)}
+.seg .btn:last-child{border-right:0}
+select{font:500 12px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:8px 8px;min-height:36px}
+.searchbox{position:relative;flex:1 1 240px;min-width:0}
+input[type=search]{font:400 15px/1 var(--mono);background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px 11px;min-height:40px;width:100%}
+.suggest{position:absolute;left:0;right:0;top:100%;margin:2px 0 0;padding:0;list-style:none;background:var(--card);border:1px solid var(--border);z-index:1001;font:400 13px/1.3 var(--mono);display:none;max-height:340px;overflow:auto}
+.suggest li{padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--rule)}
+.suggest li span{color:var(--muted)}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--panel)}
+.mapgrid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+@media (max-width:900px){.mapgrid{grid-template-columns:1fr}}
+#lmap{height:780px;border:1px solid var(--border);background:var(--sea);border-radius:2px}
+@media (max-width:900px){#lmap{height:620px}}
+@media (max-width:600px){#lmap{height:540px}}
+.leaflet-container{font:400 12px/1.4 var(--mono);background:var(--sea)}
+.leaflet-image-layer.px{image-rendering:pixelated;image-rendering:crisp-edges}
+.leaflet-bar a,.leaflet-bar a:hover{background:var(--card);color:var(--fg);border-bottom-color:var(--border)}
+@media (max-width:600px){.leaflet-control-attribution{font-size:10px;line-height:1.25}}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--card) 85%,transparent)!important;color:var(--muted)}
+.leaflet-control-attribution a{color:var(--fg)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--fg);border-radius:3px}
+.city{font:500 11px/1 var(--mono);color:var(--fg);white-space:nowrap;text-shadow:0 0 3px var(--bg),0 0 3px var(--bg),0 0 2px var(--bg);pointer-events:none}
+.zlo .city.t2{display:none}
+.city i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--fg);margin-right:4px;vertical-align:1px}
+.pin{width:18px;height:18px;border:3px solid var(--fg);border-radius:50%;background:transparent;box-shadow:0 0 0 2px var(--bg)}
+.side{background:var(--card);border:1px solid var(--border);padding:14px 14px 10px}
+.side h4{font:500 11px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+#legend{margin:4px 0 6px}
+.lgrid{display:grid;gap:2px;position:relative}
+.lgrid div{width:46px;height:40px;cursor:pointer;border:1px solid transparent}
+.lgrid div:hover,.lgrid div.on{border-color:var(--fg);outline:1px solid var(--bg)}
+.corner{font:500 11px/1.25 var(--mono);color:var(--fg)}
+.axis{font:400 11px/1.3 var(--mono);color:var(--muted)}
+#dens{width:100%;height:auto;display:block;touch-action:none;margin-top:6px}
+.sl{display:grid;grid-template-columns:62px minmax(0,1fr) 64px;gap:6px;align-items:center;font:400 12px/1.2 var(--mono);color:var(--muted);margin:4px 0}
+.sl input{width:100%}
+.sl b{font-weight:500;color:var(--fg);text-align:right}
+#hov{font:400 12.5px/1.45 var(--mono);min-height:56px;border-top:1px solid var(--rule);padding-top:8px;margin-top:8px}
+#hov b{font-weight:500}
+.sw{display:inline-block;width:12px;height:12px;vertical-align:-1px;margin-right:6px;border:1px solid var(--border)}
+.finder{background:var(--card);border:1px solid var(--border);border-top:6px solid var(--sun);padding:16px 16px 10px;margin:20px 0 14px}
+#answer .big{font:800 clamp(22px,4.6vw,30px)/1.15 var(--display);margin:10px 0 8px;text-wrap:balance}
+#answer .pn{font:400 12px/1.45 var(--mono);color:var(--muted);margin:8px 0 6px}
+.kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin:10px 0}
+.kv div{background:var(--bg);padding:8px 10px;font:400 11.5px/1.3 var(--mono);color:var(--muted)}
+.kv b{display:block;font:800 20px/1.1 var(--display);color:var(--fg)}
+@media (max-width:600px){.kv{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pull{font:600 26px/1.25 var(--display);border-left:6px solid var(--sun);padding:4px 0 4px 18px;margin:30px 0}
+.note{background:var(--panel);border:1px solid var(--rule);padding:14px 16px;font-size:16px;margin:22px 0}
+.note h3{margin-top:0}
+table.t{width:100%;border-collapse:collapse;font:400 13px/1.35 var(--mono)}
+table.t th{text-align:left;font-weight:500;color:var(--muted);border-bottom:2px solid var(--fg);padding:6px 8px 6px 0}
+table.t td{border-bottom:1px solid var(--rule);padding:7px 8px 7px 0;vertical-align:top}
+table.t td.num,table.t th.num{text-align:right;white-space:nowrap}
+table.t td small{color:var(--muted);display:block}
+table.t tr.go{cursor:pointer}
+table.t tr.go:hover td{background:var(--panel)}
+.tablewrap{overflow-x:auto}
+@media (max-width:600px){table.t .wide{display:none}}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+@media (max-width:600px){.cards{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-left:10px solid var(--sun);padding:12px 14px;font:400 13px/1.5 var(--mono);cursor:pointer}
+.card b{font:600 19px/1.2 var(--display);display:block;margin-bottom:2px}
+.card .big{font:900 30px/1.05 var(--display);margin:6px 0 2px}
+.card .big span{color:var(--muted);font:400 13px/1 var(--mono)}
+#pcan{width:100%;max-width:520px;height:auto;display:block;margin:0 auto;image-rendering:pixelated}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:700px){.two{grid-template-columns:1fr}}
+details{margin:14px 0}
+summary{font:500 13px/1.4 var(--mono);cursor:pointer;color:var(--fg);padding:8px 0}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.cta a{font:500 13px/1 var(--mono);text-decoration:none;border:1px solid var(--fg);padding:11px 14px;border-radius:3px}
+.cta a.p{background:var(--plum);border-color:var(--plum);color:#fff}
+footer{border-top:6px double var(--fg);margin-top:56px;padding-top:16px;font:400 13px/1.55 var(--mono);color:var(--muted)}
+footer p{margin:0 0 10px}
+.theme{position:fixed;right:12px;bottom:12px;z-index:1002}
+.loading{font:400 12px/1.4 var(--mono);color:var(--muted)}
+@media print{.theme,.controls{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="kicker"><b>Data study</b><span>Climate</span><span>United Kingdom, 1961 to 2020</span></div>
+<header class="hero">
+  <h1><span class="s">Sun</span> and <span class="r">rain</span></h1>
+  <svg class="mark" viewBox="0 0 120 120" aria-hidden="true"><g id="heroMark"></g></svg>
+  <p class="dek">Every square kilometre of the United Kingdom, placed by how much sunshine it gets and how much rain falls on it. Where is it sunny and dry, where dull and wet, where both at once, and how has that changed since the 1960s?</p>
+</header>
+<div class="byline">Dr Tristan Hotham, Independent researcher · October 2026 · Data: Met Office HadUK-Grid (Open Government Licence v3); OS Open Names; GeoNames</div>
+
+<div class="stats">
+  <div><b class="s">1,403</b><span>hours of bright sunshine a year, on average across the UK, 1991 to 2020</span></div>
+  <div><b class="r">1,162</b><span>millimetres of rain a year, on average across the UK</span></div>
+  <div><b>2.5×</b><span>more sun at Dungeness (1,992 h) than on Ben Nevis (784 h)</span></div>
+  <div><b class="s">+5.6%</b><span>more sunshine than in 1961 to 1990; England +7.5%</span></div>
+</div>
+
+<p class="lede">British weather talk runs on two numbers: how much sun, how much rain. The Met Office measures both at hundreds of stations and spreads them, with careful statistics, onto a grid of one kilometre squares that covers the whole country. That grid, HadUK-Grid, is open data. I took its thirty-year averages for 1991 to 2020 and for 1961 to 1990 and put every one of the UK's 245,077 squares on two scales at once.</p>
+<p>The map below colours each square by both. Sunshine runs from pale to marigold, rainfall from pale to teal, and a square that is both sunny and wet goes a deep aubergine. Every colour is a mix you can read: hover over the key to light up just those squares, change the season or month, move the breaks, or switch to the 1960s.</p>
+
+<h2><span class="n">01 · The map</span>Sunny and dry, dull and wet</h2>
+<div class="figure bleed">
+  <div class="controls">
+    <label class="l">Period</label>
+    <div class="seg" role="group" aria-label="Period" id="perBtns"><button class="btn" data-p="now" aria-pressed="true">1991 to 2020</button><button class="btn" data-p="then" aria-pressed="false">1961 to 1990</button><button class="btn" data-p="chg" aria-pressed="false">What changed</button></div>
+    <label class="l" for="when">When</label>
+    <select id="when" aria-label="Year, season or month"><option value="ann">The whole year</option><option value="s:winter">Winter (Dec to Feb)</option><option value="s:spring">Spring (Mar to May)</option><option value="s:summer">Summer (Jun to Aug)</option><option value="s:autumn">Autumn (Sep to Nov)</option></select>
+  </div>
+  <div class="controls">
+    <label class="l">Classes</label>
+    <div class="seg" role="group" aria-label="Number of classes" id="nBtns"><button class="btn" data-n="3" aria-pressed="true">3 × 3</button><button class="btn" data-n="4" aria-pressed="false">4 × 4</button></div>
+    <label class="l">Breaks</label>
+    <div class="seg" role="group" aria-label="Class breaks" id="bBtns"><button class="btn" data-b="q" aria-pressed="true">Equal shares of land</button><button class="btn" data-b="f" aria-pressed="false">Fixed (set them)</button></div>
+    <span class="loading" id="loadMsg"></span>
+  </div>
+  <div class="mapgrid">
+    <div id="lmap" role="region" aria-label="Bivariate map of sunshine and rainfall across the United Kingdom at 1 km"></div>
+    <div class="side">
+      <h4 id="keyTitle">Key: hover a square to light up those places</h4>
+      <div id="legend"></div>
+      <canvas id="dens" width="620" height="520" aria-label="Every square kilometre plotted by sunshine and rainfall, with the class breaks"></canvas>
+      <div class="axis" id="densNote">Each grey speck is a 1 km square, placed by its sunshine (across) and rainfall (up, log scale). The coloured blocks are the classes; drag the sliders to move the breaks.</div>
+      <div id="sliders"></div>
+      <div id="hov">Hover or tap the map to read a square.</div>
+    </div>
+  </div>
+  <div class="src">Met Office HadUK-Grid v1.3.2 1 km thirty-year averages. "Equal shares of land" puts the breaks at the terciles (or quartiles) of the squares on show, so each row and column of the key covers the same area of the UK; fixed breaks stay put when you change period, which is the fair way to compare the 1960s with now. Values on the page are rounded for compactness (annual sunshine to within 3 hours, rainfall to within 1%). Ireland and France are drawn in grey for context only.</div>
+</div>
+
+<p>The pattern is the one most of us carry in our heads, drawn sharper than we usually draw it. Sunshine and rainfall pull hard against each other: across all the squares, the rank correlation between them is −0.72. The south and east are sunny and dry, the north and west dull and wet. Sunshine varies by a factor of 2.5 across the country, from 1,992 hours a year on the shingle at Dungeness in Kent to 784 in the square that holds the summit of Ben Nevis. Rainfall varies by a factor of 10.2, from under 500 mm on the Isle of Sheppey (493 mm) to 4,796 mm in the fells at the head of Borrowdale in the Lake District.</p>
+<p>One square is drier still: a single coastal square at the mouth of the Tees, with 469 mm. Its neighbours average 599 mm, so I treat it as a quirk of the gridding at the edge of the land rather than a real dry spot.</p>
+
+<h2><span class="n">02 · Your square</span>What is the weather like where you are?</h2>
+<p>Type a town, village or postcode, use your location, or click the map. You get the square's sunshine, rain and daytime highs for every month, how it compares with the rest of the UK, and how it has changed since 1961 to 1990. Then ask the map where else has weather like yours.</p>
+<div class="finder">
+  <div class="controls">
+    <div class="searchbox">
+      <input type="search" id="q" placeholder="Town, village or postcode" aria-label="Find a place or postcode" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="sug">
+      <ul class="suggest" id="sug" role="listbox"></ul>
+    </div>
+    <button class="btn" id="geo">Use my location</button>
+  </div>
+  <div id="answer"><div class="pn">Try Ventnor, Fort William, Southend-on-Sea or Belfast. Place names are looked up on this page (OS Open Names for Great Britain; GeoNames towns for Northern Ireland). Postcodes are looked up with postcodes.io, a free service built on Office for National Statistics and Ordnance Survey open data.</div></div>
+</div>
+
+<h2><span class="n">03 · Four corners</span>Where the extremes meet</h2>
+<p>With equal-share breaks, each third of the UK's land is "sunny", "middling" or "dull", and each third is "dry", "middling" or "wet". If sun and rain were unrelated, each of the nine boxes would hold a ninth of the country. They do not. Two corners are huge and two are almost empty.</p>
+<div class="cards" id="corners">
+  <div class="card" data-c="0,2"><b>Sunny and dry</b><div class="big">21% <span>of the land</span></div>East of England, the South East and the East Midlands. Its towns hold 49% of the people in towns of 15,000 or more, London among them.</div>
+  <div class="card" data-c="2,0"><b>Dull and wet</b><div class="big">24% <span>of the land</span></div>75% of it in Scotland. Few people live there: 10 bigger towns, among them Rochdale, Greenock and Rossendale.</div>
+  <div class="card" data-c="2,2"><b>Sunny and wet</b><div class="big">1.9% <span>of the land</span></div>Rare. Cornwall and Devon (37% and 27% of it) and the coasts of Carmarthenshire and Pembrokeshire. Swansea is the biggest town in it.</div>
+  <div class="card" data-c="0,0"><b>Dull and dry</b><div class="big">0.2% <span>of the land</span></div>Rarest of all: 608 km², mostly in Highland and Moray around the Moray Firth, in the rain shadow of the mountains. Inverness is its only big town.</div>
+</div>
+<p>Click a card to light up its squares on the map. The sunny and wet corner is the interesting one. Sunshine in Britain comes mostly from the south, the sea and the clear air behind weather fronts; rain comes mostly from the west and the hills. The far south west is exposed to both, so Cornwall's coasts can be among the sunniest in Britain and still catch well over a metre of rain. Dull and dry is the reverse: the lowlands round the Moray Firth sit in the lee of the Highlands, so the rain has fallen before the air arrives, but they are far enough north that winter days are short and cloud is common.</p>
+<p>People and land do not match. The sunny and dry third holds 339 of the 803 UK towns and cities with 15,000 people or more and 49% of their population. The dull and wet quarter holds 0.7%.</p>
+
+<h2><span class="n">04 · The bright edge</span>Why the coast gets more sun</h2>
+<p>The sunniest squares in the UK are almost all beside the sea. Of the 1% of squares with the most sunshine (at least 1,797 hours a year), 80% lie within 5 km of the coast, though only 19% of Great Britain's land does. 82% of them are in the South East region: the Isle of Wight, the Sussex and Kent coasts and Dungeness. Cloud tends to build over warm land during the day, especially in spring and summer, while the air over the cooler sea stays clearer, so the coast keeps more of the sun.</p>
+<div class="figure">
+  <div class="fig-h">Sunshine by distance from the sea</div>
+  <div class="fig-sub">Mean annual sunshine, 1991 to 2020, of Great Britain's 1 km squares, by distance from the coast. Northern Ireland is left out because its border with the Republic of Ireland is not a coast.</div>
+  <div class="chart" id="coastChart"></div>
+</div>
+<p>Within each nation, the coastal strip is the sunny part. The first 2 km of England get 1,684 hours a year against 1,505 more than 20 km inland; in Wales it is 1,578 against 1,331. Across Great Britain as a whole the effect hides, because so much of the coast is in Scotland.</p>
+
+<h2><span class="n">05 · Then and now</span>A brighter, wetter country</h2>
+<p>Switch the map to 1961 to 1990, or to "What changed". The UK of 1991 to 2020 was sunnier than the UK of 1961 to 1990 by 75 hours a year on average (5.6%), and wetter by 79 mm (7.2%). Both at once: 90% of the land got sunnier and wetter. Only 8.3% got duller and 1.5% drier.</p>
+<div class="figure">
+  <div class="fig-h">Change in sunshine and rainfall, 1961 to 1990 to 1991 to 2020</div>
+  <div class="fig-sub">Percentage change in the mean of each nation's and English region's 1 km squares.</div>
+  <div class="chart" id="chgChart"></div>
+  <div class="src">Sunshine in marigold, rainfall in teal.</div>
+</div>
+<p>The brightening is strongest in England (7.5%) and weakest in Northern Ireland (1.8%). Within England it is biggest in the North East (11.1%) and the East Midlands (10.1%), and the towns that gained most are on Tyneside and in south Northumberland: Ashington, Blyth and Bedlington all gained 17.5% or more. Sheffield gained 14.8%. The area with more than 1,600 hours of sun a year grew from 9,881 km² to 42,725 km².</p>
+<p class="pull">The UK's sunny third grew from 26,992 km² to 81,886 km², using the same break.</p>
+<p>Look closely at the "What changed" map and you will see rings and blobs: patches of strong or weak change centred on single places. These are the fingerprints of individual weather stations whose records changed more or less than their neighbours, spread out by the gridding. So read the change map for its broad pattern, not for your own square.</p>
+<p>Why the broad pattern? I do not test causes here, and the two periods differ in how sunshine was measured as well as in the weather. But the pattern fits a well-known story: the smoke and sulphur haze of the industrial towns cleared after the Clean Air Acts of 1956 and 1968 and the decline of heavy industry, and the old industrial North East and Midlands are where the sun grew most. The wetter decades fit the long-term rise in UK rainfall the Met Office reports, which is concentrated in winter and in Scotland.</p>
+
+<h2><span class="n">06 · Through the year</span>May is the sunniest month</h2>
+<p>Pick any month or season in the map's "When" menu (the monthly maps load when you ask for them). Across the UK, May is the sunniest month on average and December the dullest and the wettest. May is the sunniest month in 72% of squares and July in 27%, mostly in the south and east. In December, Ventnor on the Isle of Wight gets 67 hours of sun; parts of Shetland get 9.</p>
+<div class="figure">
+  <div class="controls"><div class="seg" role="group" aria-label="Measure" id="monBtns"><button class="btn" data-m="sun" aria-pressed="true">Sunshine</button><button class="btn" data-m="rain" aria-pressed="false">Rainfall</button></div></div>
+  <div class="fig-h" id="monH">Monthly sunshine by nation</div>
+  <div class="fig-sub">Mean of each nation's 1 km squares, 1991 to 2020.</div>
+  <div class="chart" id="monChart"></div>
+</div>
+<p>The wettest month varies more: December in 28% of squares, October in 26%, November in 24% and January in 15%. The wet west gets more of its rain in winter: 32% falls in December to February in the wettest third of the land, against 25% in the driest third.</p>
+
+<h2><span class="n">07 · Warm months</span>How many months are pleasantly warm?</h2>
+<p>A sister project asks how many months a year are pleasantly warm across the whole world, counting months whose average daily high falls in a band. Here is the UK at 1 km with the Met Office's maximum temperatures. With the default band of 18 to 27 °C, 25% of the land has no such month, and the most anywhere is 5, in and around London. Move the band and watch the country change.</p>
+<div class="figure">
+  <div class="controls">
+    <div class="sl" style="flex:1 1 260px"><span>Lowest</span><input type="range" id="plo" min="5" max="25" step="0.5" value="18" aria-label="Lowest daily high"><b id="ploV">18 °C</b></div>
+    <div class="sl" style="flex:1 1 260px"><span>Highest</span><input type="range" id="phi" min="10" max="30" step="0.5" value="27" aria-label="Highest daily high"><b id="phiV">27 °C</b></div>
+  </div>
+  <div class="two">
+    <canvas id="pcan" aria-label="Map of the number of months whose mean daily high is in the chosen band"></canvas>
+    <div><div class="fig-h" id="pH">Months with a mean daily high in the band</div><div class="chart" id="pHist"></div><div class="legend" id="pLeg"></div>
+    <div class="src">Mean daily maximum temperature by month, 1991 to 2020. A month counts if its average high is in the band; nights, humidity, wind and rain are ignored. World version: <a href="https://tristan-hotham.github.io/pleasant-months/">How many months a year are pleasantly warm?</a></div></div>
+  </div>
+</div>
+
+<h2><span class="n">08 · Rankings</span>The sunniest and wettest towns</h2>
+<p>Among the 803 UK towns and cities with at least 15,000 people (GeoNames), Folkestone is the sunniest, with 1,937 hours a year, ahead of Sandown on the Isle of Wight and Dover. Among all 1,426 towns in OS Open Names, Ventnor (1,955 hours) tops the list. Fort William is both the dullest and the wettest bigger town (927 hours, 2,405 mm), with the Rhondda close behind on rain. The driest are in south Essex: Southend-on-Sea gets 526 mm. Of the 30 places with 250,000 people or more in GeoNames, Southend is sunniest and Belfast dullest (1,271 hours). London gets 1,559 hours and 618 mm.</p>
+<div class="figure">
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Ranking" id="rkBtns"><button class="btn" data-k="sunny" aria-pressed="true">Sunniest</button><button class="btn" data-k="dull" aria-pressed="false">Dullest</button><button class="btn" data-k="wet" aria-pressed="false">Wettest</button><button class="btn" data-k="dry" aria-pressed="false">Driest</button><button class="btn" data-k="gain" aria-pressed="false">Most brightened</button></div>
+    <div class="seg" role="group" aria-label="Which towns" id="rsBtns"><button class="btn" data-s="1" aria-pressed="true">15,000+ people</button><button class="btn" data-s="0" aria-pressed="false">All OS towns</button></div>
+  </div>
+  <div class="fig-sub" id="rkSub"></div>
+  <div class="tablewrap"><table class="t" id="rkt"></table></div>
+  <div class="src">Each town takes the average of the land squares in the 3 km by 3 km block around its point in GeoNames or OS Open Names, so a town's figure is its centre, not its edges. The ranking follows the map's "When" menu: pick a month or season there to rank by it. "Most brightened" compares 1991 to 2020 with 1961 to 1990.</div>
+</div>
+
+<div class="note" id="method">
+  <h3>How I did this</h3>
+  <p><b>Data.</b> The Met Office's HadUK-Grid (version 1.3.2) interpolates observations from the UK's weather stations onto a 1 km grid on the British National Grid, using regression on geography (height, distance from the coast, urban land and so on) and smoothing of the leftovers between stations. I used its thirty-year averages: annual sunshine hours and rainfall for 1961 to 1990 and 1991 to 2020, and monthly sunshine, rainfall and mean daily maximum temperature for 1991 to 2020. There are 245,077 land squares. HadUK-Grid is published by the Met Office through the Centre for Environmental Data Analysis under the Open Government Licence.</p>
+  <p><b>Classes.</b> By default the breaks are the terciles (3 by 3) or quartiles (4 by 4) of the squares, each square counting as one square kilometre, so every row and column of the key covers the same land area; you can set them yourself instead. The colours are my own, mixed from four corners in a perceptual colour space. For "What changed", the classes are of percentage change.</p>
+  <p><b>Places.</b> Towns are GeoNames places with 15,000 or more people (not counting parts of other places) and the cities and towns of OS Open Names; each takes the mean of the land squares within its 3 km block. Regions come from the nearest OS Open Names place; Northern Ireland is its own land area on the grid. Distances from the sea are measured from the grid's coastline.</p>
+  <p><b>Limits.</b> These are averages over thirty years, not any one year, and a grid is a model of the weather between stations, not a measurement in every square: values in remote hills rest on few stations, and the hilltop figures are estimates. Sunshine recorders changed over the decades (from the glass-ball Campbell-Stokes recorder to electronic sensors), and the station network changed too, so part of the change between the two periods may come from the instruments. The page stores values in a compressed form, so the figures it shows are rounded slightly; every number quoted in the text comes from the full-resolution data.</p>
+</div>
+<div class="cta">
+  <a class="p" href="https://github.com/Tristan-Hotham/sun-and-rain-uk">Data and code</a>
+  <a href="https://doi.org/10.5281/zenodo.23732582">Paper (Zenodo)</a>
+  <a href="https://tristan-hotham.github.io/sun-and-rain/">The world version</a>
+  <a href="https://blog.tristanhotham.com/">Blog</a>
+</div>
+<footer>
+  <p>Dr Tristan Hotham, Independent researcher. ORCID 0000-0003-4931-9349. Cite as: Hotham, T. (2026) Sun and rain: the UK's sunshine against its rainfall at 1 km, 1961 to 2020. https://doi.org/10.5281/zenodo.23732582</p>
+  <p>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</p>
+  <p>Climate data: Met Office; Hollis, D., McCarthy, M., Kendon, M. and Legg, T. (2026) HadUK-Grid Gridded Climate Observations on a 1km grid over the UK, v1.3.2.ceda (1836 to 2025). NERC EDS Centre for Environmental Data Analysis. Contains Met Office data © Crown copyright 2026, Open Government Licence v3. Places: OS Open Names, contains OS data © Crown copyright and database right 2026 (Open Government Licence v3.0); GeoNames (CC BY 4.0). Context land: Natural Earth (public domain). Postcode lookups: postcodes.io. Map library: Leaflet.</p>
+  <p>Data files: Open Government Licence v3 (they are derived from Met Office and OS data). Text and figures: CC BY 4.0. Code: MIT. Other studies: <a href="https://tristan-hotham.github.io/pleasant-months/">Pleasant months</a>, <a href="https://tristan-hotham.github.io/sun-and-rain/">Sun and rain: the world</a>, <a href="https://tristan-hotham.github.io/sea-level/">Drowned and rising</a>, <a href="https://blog.tristanhotham.com/">all posts</a>.</p>
+</footer>
+</div>
+<div class="tip" id="tip"></div>
+<button class="btn theme" id="theme" aria-label="Toggle dark mode">◐</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const R = {"meta":{"cells":245077,"area_km2":245077,"periods":["1961 to 1990","1991 to 2020"],"version":"HadUK-Grid v1.3.2.ceda","quant_err":{"sun_a":3.0,"rain_a_pct":0.5345021019926843,"sun_m":0.600006103515625,"rain_m_pct":0.7858744410390583,"tmax":0.0625009536743164}},"uk":{"sun":1403.0,"rain":1162.0,"sun6190":1328.0,"rain6190":1084.0,"sun_chg_pct":5.6,"rain_chg_pct":7.2,"sun_chg_h":75.0,"rain_chg_mm":79.0,"sun_min":784.0,"sun_max":1992.0,"rain_min":469.0,"rain_max":4796.0,"sun_ratio":2.5,"rain_ratio":10.2,"sun_p10":1125.0,"sun_p90":1638.0,"rain_p10":639.0,"rain_p90":1949.0,"sun_median":1428.0,"rain_median":986.0,"sunniest":{"near":"Dungeness","county":"Kent","km":0.3,"e_km":609.5,"n_km":117.5,"region":"South East","sun":1992.0,"rain":704.0},"dullest":{"near":"Torlundy","county":"Highland","km":5.9,"e_km":216.5,"n_km":771.5,"region":"Scotland","sun":784.0,"rain":3740.0},"wettest":{"near":"Rosthwaite","county":"Cumberland","km":4.9,"e_km":322.5,"n_km":510.5,"region":"North West","sun":1258.0,"rain":4796.0},"driest":{"near":"Easington","county":"Redcar and Cleveland","km":1.8,"e_km":475.5,"n_km":519.5,"region":"North East","sun":1610.0,"rain":469.0,"neighbours_mean":599.0},"driest_other":{"near":"Bay View","county":"Kent","km":0.3,"e_km":601.5,"n_km":170.5,"region":"South East","sun":1849.0,"rain":493.0},"rho_sun_rain":-0.72,"rho_sun_rain_6190":-0.63},"regions":[{"level":"nation","name":"England","area_km2":130576,"sun":1539.0,"rain":869.0,"sun6190":1431.0,"rain6190":820.0,"sun_chg_pct":7.5,"rain_chg_pct":6.0,"sun_chg_h":108.0,"share_sunnier":0.983,"share_wetter":0.985},{"level":"nation","name":"Scotland","area_km2":79362,"sun":1203.0,"rain":1569.0,"sun6190":1168.0,"rain6190":1442.0,"sun_chg_pct":3.0,"rain_chg_pct":8.8,"sun_chg_h":35.0,"share_sunnier":0.833,"share_wetter":0.986},{"level":"nation","name":"Wales","area_km2":20813,"sun":1409.0,"rain":1459.0,"sun6190":1353.0,"rain6190":1375.0,"sun_chg_pct":4.1,"rain_chg_pct":6.2,"sun_chg_h":55.0,"share_sunnier":0.928,"share_wetter":0.974},{"level":"nation","name":"Northern Ireland","area_km2":14326,"sun":1259.0,"rain":1153.0,"sun6190":1237.0,"rain6190":1087.0,"sun_chg_pct":1.8,"rain_chg_pct":6.1,"sun_chg_h":23.0,"share_sunnier":0.764,"share_wetter":0.992},{"level":"region","name":"North East","area_km2":8495,"sun":1442.0,"rain":887.0,"sun6190":1297.0,"rain6190":828.0,"sun_chg_pct":11.1,"rain_chg_pct":7.2,"sun_chg_h":144.0,"share_sunnier":1.0,"share_wetter":0.989},{"level":"region","name":"North West","area_km2":14307,"sun":1383.0,"rain":1278.0,"sun6190":1304.0,"rain6190":1201.0,"sun_chg_pct":6.1,"rain_chg_pct":6.3,"sun_chg_h":79.0,"share_sunnier":1.0,"share_wetter":0.977},{"level":"region","name":"Yorkshire and the Humber","area_km2":15431,"sun":1432.0,"rain":864.0,"sun6190":1316.0,"rain6190":823.0,"sun_chg_pct":8.8,"rain_chg_pct":4.9,"sun_chg_h":116.0,"share_sunnier":1.0,"share_wetter":0.965},{"level":"region","name":"East Midlands","area_km2":15582,"sun":1541.0,"rain":704.0,"sun6190":1399.0,"rain6190":669.0,"sun_chg_pct":10.1,"rain_chg_pct":5.2,"sun_chg_h":142.0,"share_sunnier":1.0,"share_wetter":0.995},{"level":"region","name":"West Midlands","area_km2":12962,"sun":1484.0,"rain":772.0,"sun6190":1373.0,"rain6190":730.0,"sun_chg_pct":8.1,"rain_chg_pct":5.8,"sun_chg_h":111.0,"share_sunnier":1.0,"share_wetter":0.988},{"level":"region","name":"East of England","area_km2":19180,"sun":1617.0,"rain":627.0,"sun6190":1498.0,"rain6190":597.0,"sun_chg_pct":8.0,"rain_chg_pct":4.9,"sun_chg_h":120.0,"share_sunnier":1.0,"share_wetter":0.989},{"level":"region","name":"London","area_km2":1577,"sun":1605.0,"rain":650.0,"sun6190":1475.0,"rain6190":632.0,"sun_chg_pct":8.8,"rain_chg_pct":2.9,"sun_chg_h":130.0,"share_sunnier":1.0,"share_wetter":0.971},{"level":"region","name":"South East","area_km2":19147,"sun":1667.0,"rain":786.0,"sun6190":1554.0,"rain6190":742.0,"sun_chg_pct":7.3,"rain_chg_pct":5.9,"sun_chg_h":113.0,"share_sunnier":0.99,"share_wetter":0.987},{"level":"region","name":"South West","area_km2":23895,"sun":1594.0,"rain":1056.0,"sun6190":1525.0,"rain6190":986.0,"sun_chg_pct":4.5,"rain_chg_pct":7.2,"sun_chg_h":69.0,"share_sunnier":0.918,"share_wetter":0.989}],"region_rank":{"sun":["South East","East of England","London","South West","East Midlands","West Midlands","North East","Yorkshire and the Humber","North West"],"sun_chg":["North East","East Midlands","Yorkshire and the Humber","London","West Midlands","East of England","South East","North West","South West"]},"nation":{"England":{"area_km2":130576,"sun":1539.0,"rain":869.0,"sun6190":1431.0,"rain6190":820.0,"sun_chg_pct":7.5,"rain_chg_pct":6.0,"sun_chg_h":108.0,"share_sunnier":0.983,"share_wetter":0.985},"Scotland":{"area_km2":79362,"sun":1203.0,"rain":1569.0,"sun6190":1168.0,"rain6190":1442.0,"sun_chg_pct":3.0,"rain_chg_pct":8.8,"sun_chg_h":35.0,"share_sunnier":0.833,"share_wetter":0.986},"Wales":{"area_km2":20813,"sun":1409.0,"rain":1459.0,"sun6190":1353.0,"rain6190":1375.0,"sun_chg_pct":4.1,"rain_chg_pct":6.2,"sun_chg_h":55.0,"share_sunnier":0.928,"share_wetter":0.974},"Northern Ireland":{"area_km2":14326,"sun":1259.0,"rain":1153.0,"sun6190":1237.0,"rain6190":1087.0,"sun_chg_pct":1.8,"rain_chg_pct":6.1,"sun_chg_h":23.0,"share_sunnier":0.764,"share_wetter":0.992}},"breaks":{"sun3":[1310.0,1526.0],"rain3":[817.0,1231.0],"sun4":[1256.0,1428.0,1564.0],"rain4":[739.0,986.0,1397.0]},"classes":{"share":[[0.002,0.121,0.21],[0.09,0.138,0.105],[0.24,0.074,0.019]],"note":"share[rain class][sun class], 0 = lowest","sunny_dry":{"share":0.21,"km2":51389,"top_regions":[{"region":"East of England","share":0.344},{"region":"South East","share":0.211},{"region":"East Midlands","share":0.184},{"region":"South West","share":0.072}]},"sunny_wet":{"share":0.019,"km2":4651,"top_regions":[{"region":"South West","share":0.664},{"region":"Wales","share":0.284},{"region":"Scotland","share":0.047},{"region":"North West","share":0.005}],"top_counties":[{"county":"Cornwall","share":0.369},{"county":"Devon","share":0.272},{"county":"Carmarthenshire","share":0.076},{"county":"Pembrokeshire","share":0.071},{"county":"Dumfries and Galloway","share":0.044}]},"dull_dry":{"share":0.002,"km2":608,"top_regions":[{"region":"Scotland","share":0.959},{"region":"Northern Ireland","share":0.035},{"region":"North West","share":0.007}],"top_counties":[{"county":"Highland","share":0.773},{"county":"Moray","share":0.12},{"county":"Northern Ireland","share":0.035},{"county":"Aberdeenshire","share":0.035},{"county":"Midlothian","share":0.015}]},"dull_wet":{"share":0.24,"km2":58762,"top_regions":[{"region":"Scotland","share":0.75},{"region":"Wales","share":0.088},{"region":"Northern Ireland","share":0.073},{"region":"North West","share":0.047}]},"middle":{"share":0.138,"km2":33747,"top_regions":[{"region":"Scotland","share":0.301},{"region":"North West","share":0.161},{"region":"Northern Ireland","share":0.104},{"region":"Wales","share":0.101}]}},"palette":{"3":[["#F4F0E6","#FAC08A","#F0902A"],["#99BDBD","#A0887D","#975241"],["#2E8C96","#43546D","#3E1C47"]],"4":[["#F4F0E6","#FAD0A8","#F8B06C","#F0902A"],["#B8CECB","#BEAB99","#BC896A","#B4663D"],["#7AADB0","#82888A","#816466","#7A3F44"],["#2E8C96","#40667B","#434260","#3E1C47"]],"corners":{"dull_dry":"#F4F0E6","sunny_dry":"#F0902A","dull_wet":"#2E8C96","sunny_wet":"#3E1C47"}},"towns_n":803,"towns_pop":55514590,"os_towns_n":1426,"town_classes":{"sunny_dry":{"n":339,"pop_share":0.487,"biggest":[{"name":"London","pop":8961989,"sun":1559,"rain":618},{"name":"Islington","pop":319143,"sun":1561,"rain":629},{"name":"Reading","pop":318014,"sun":1578,"rain":650},{"name":"Kingston upon Hull","pop":314018,"sun":1582,"rain":683},{"name":"Southend-on-Sea","pop":295310,"sun":1780,"rain":526},{"name":"Brighton","pop":283870,"sun":1764,"rain":782}]},"sunny_wet":{"n":10,"pop_share":0.011,"biggest":[{"name":"Swansea","pop":300352,"sun":1555,"rain":1262},{"name":"Bridgend","pop":49597,"sun":1570,"rain":1247},{"name":"Cwmbran","pop":48535,"sun":1532,"rain":1388},{"name":"Redruth","pop":42690,"sun":1611,"rain":1273},{"name":"Coity","pop":41352,"sun":1526,"rain":1390},{"name":"Caerphilly","pop":31060,"sun":1538,"rain":1457}]},"dull_dry":{"n":1,"pop_share":0.001,"biggest":[{"name":"Inverness","pop":47790,"sun":1245,"rain":747}]},"dull_wet":{"n":10,"pop_share":0.007,"biggest":[{"name":"Rochdale","pop":97550,"sun":1287,"rain":1273},{"name":"Rossendale","pop":67400,"sun":1299,"rain":1485},{"name":"Cumbernauld","pop":50530,"sun":1287,"rain":1360},{"name":"Greenock","pop":41280,"sun":1295,"rain":1622},{"name":"Saddleworth","pop":25441,"sun":1295,"rain":1281},{"name":"Vale of Leven","pop":24640,"sun":1305,"rain":1463}]},"middle":{"n":139,"pop_share":0.146,"biggest":[{"name":"Glasgow","pop":626410,"sun":1318,"rain":1045},{"name":"Manchester","pop":568996,"sun":1370,"rain":907},{"name":"Liverpool","pop":496770,"sun":1477,"rain":873},{"name":"Bradford","pop":366187,"sun":1326,"rain":876},{"name":"Preston","pop":313332,"sun":1407,"rain":1053},{"name":"Stoke-on-Trent","pop":258366,"sun":1403,"rain":861}]},"land_vs_people":"share of land vs share of people in towns of 15,000+"},"towns":{"sunniest":[{"name":"Folkestone","region":"South East","pop":66429,"sun":1937,"rain":796,"sun6190":1756,"rain6190":733,"sun_chg_pct":10.3},{"name":"Sandown","region":"South East","pop":20155,"sun":1928,"rain":896,"sun6190":1823,"rain6190":821,"sun_chg_pct":5.8},{"name":"Dover","region":"South East","pop":41709,"sun":1918,"rain":851,"sun6190":1713,"rain6190":801,"sun_chg_pct":12.0},{"name":"Hastings","region":"South East","pop":92855,"sun":1905,"rain":779,"sun6190":1724,"rain6190":744,"sun_chg_pct":10.5},{"name":"Deal","region":"South East","pop":30917,"sun":1903,"rain":715,"sun6190":1709,"rain6190":672,"sun_chg_pct":11.4},{"name":"Bognor Regis","region":"South East","pop":63885,"sun":1898,"rain":744,"sun6190":1840,"rain6190":720,"sun_chg_pct":3.1},{"name":"Weymouth","region":"South West","pop":53416,"sun":1889,"rain":820,"sun6190":1752,"rain6190":756,"sun_chg_pct":7.8},{"name":"Christchurch","region":"South West","pop":31372,"sun":1875,"rain":805,"sun6190":1768,"rain6190":729,"sun_chg_pct":6.0},{"name":"Herne Bay","region":"South East","pop":24875,"sun":1869,"rain":571,"sun6190":1672,"rain6190":558,"sun_chg_pct":11.8},{"name":"Broadstairs","region":"South East","pop":23283,"sun":1868,"rain":624,"sun6190":1672,"rain6190":602,"sun_chg_pct":11.8}],"dullest":[{"name":"Fort William","region":"Scotland","pop":15757,"sun":927,"rain":2405,"sun6190":912,"rain6190":2116,"sun_chg_pct":1.6},{"name":"Derry","region":"Northern Ireland","pop":83652,"sun":1168,"rain":1126,"sun6190":1166,"rain6190":1033,"sun_chg_pct":0.1},{"name":"Omagh","region":"Northern Ireland","pop":21056,"sun":1181,"rain":1133,"sun6190":1170,"rain6190":1037,"sun_chg_pct":0.9},{"name":"Coleraine","region":"Northern Ireland","pop":25681,"sun":1210,"rain":1045,"sun6190":1198,"rain6190":976,"sun_chg_pct":1.0},{"name":"Isle of Lewis","region":"Scotland","pop":18500,"sun":1212,"rain":1348,"sun6190":1188,"rain6190":1246,"sun_chg_pct":2.1},{"name":"Inverness","region":"Scotland","pop":47790,"sun":1245,"rain":747,"sun6190":1191,"rain6190":659,"sun_chg_pct":4.6},{"name":"Ballymena","region":"Northern Ireland","pop":28932,"sun":1252,"rain":1072,"sun6190":1264,"rain6190":1013,"sun_chg_pct":-0.9},{"name":"Nelson","region":"North West","pop":29317,"sun":1264,"rain":1193,"sun6190":1188,"rain6190":1175,"sun_chg_pct":6.4},{"name":"Burnley","region":"North West","pop":149422,"sun":1264,"rain":1155,"sun6190":1194,"rain6190":1130,"sun_chg_pct":5.9},{"name":"Belfast","region":"Northern Ireland","pop":348005,"sun":1271,"rain":982,"sun6190":1270,"rain6190":934,"sun_chg_pct":0.1}],"wettest":[{"name":"Fort William","region":"Scotland","pop":15757,"sun":927,"rain":2405,"sun6190":912,"rain6190":2116,"sun_chg_pct":1.6},{"name":"Rhondda","region":"Wales","pop":69506,"sun":1426,"rain":2271,"sun6190":1331,"rain6190":2076,"sun_chg_pct":7.2},{"name":"Tonypandy","region":"Wales","pop":62545,"sun":1460,"rain":2125,"sun6190":1360,"rain6190":1950,"sun_chg_pct":7.3},{"name":"Maesteg","region":"Wales","pop":21001,"sun":1440,"rain":1968,"sun6190":1350,"rain6190":1833,"sun_chg_pct":6.6},{"name":"Aberdare","region":"Wales","pop":31135,"sun":1381,"rain":1937,"sun6190":1292,"rain6190":1782,"sun_chg_pct":6.9},{"name":"Pontypridd","region":"Wales","pop":31206,"sun":1497,"rain":1742,"sun6190":1394,"rain6190":1573,"sun_chg_pct":7.3},{"name":"Greenock","region":"Scotland","pop":41280,"sun":1295,"rain":1622,"sun6190":1224,"rain6190":1519,"sun_chg_pct":5.8},{"name":"Gelligaer","region":"Wales","pop":17376,"sun":1432,"rain":1608,"sun6190":1341,"rain6190":1443,"sun_chg_pct":6.8},{"name":"Ebbw Vale","region":"Wales","pop":33068,"sun":1375,"rain":1550,"sun6190":1312,"rain6190":1460,"sun_chg_pct":4.9},{"name":"Pontypool","region":"Wales","pop":35686,"sun":1499,"rain":1541,"sun6190":1370,"rain6190":1379,"sun_chg_pct":9.4}],"driest":[{"name":"Southend-on-Sea","region":"East of England","pop":295310,"sun":1780,"rain":526,"sun6190":1567,"rain6190":522,"sun_chg_pct":13.6},{"name":"Rochford","region":"East of England","pop":16739,"sun":1755,"rain":530,"sun6190":1541,"rain6190":513,"sun_chg_pct":13.9},{"name":"Canvey Island","region":"East of England","pop":38170,"sun":1754,"rain":533,"sun6190":1541,"rain6190":522,"sun_chg_pct":13.8},{"name":"Grays","region":"East of England","pop":89755,"sun":1665,"rain":540,"sun6190":1489,"rain6190":517,"sun_chg_pct":11.8},{"name":"South Benfleet","region":"East of England","pop":48824,"sun":1728,"rain":540,"sun6190":1515,"rain6190":521,"sun_chg_pct":14.1},{"name":"Walton-on-the-Naze","region":"East of England","pop":17458,"sun":1821,"rain":550,"sun6190":1651,"rain6190":533,"sun_chg_pct":10.3},{"name":"Bedford","region":"East of England","pop":106940,"sun":1566,"rain":555,"sun6190":1438,"rain6190":533,"sun_chg_pct":8.9},{"name":"Gravesend","region":"South East","pop":54263,"sun":1679,"rain":555,"sun6190":1502,"rain6190":534,"sun_chg_pct":11.8},{"name":"Clacton-on-Sea","region":"East of England","pop":50548,"sun":1808,"rain":556,"sun6190":1624,"rain6190":538,"sun_chg_pct":11.3},{"name":"Thamesmead","region":"London","pop":31824,"sun":1577,"rain":558,"sun6190":1440,"rain6190":530,"sun_chg_pct":9.5}],"gained":[{"name":"Ashington","region":"North East","pop":27670,"sun":1603,"rain":659,"sun6190":1359,"rain6190":640,"sun_chg_pct":18.0},{"name":"Blyth","region":"North East","pop":37339,"sun":1632,"rain":655,"sun6190":1389,"rain6190":627,"sun_chg_pct":17.5},{"name":"Bedlington","region":"North East","pop":18470,"sun":1569,"rain":662,"sun6190":1336,"rain6190":638,"sun_chg_pct":17.5},{"name":"Whitley Bay","region":"North East","pop":38055,"sun":1609,"rain":657,"sun6190":1376,"rain6190":636,"sun_chg_pct":17.0},{"name":"Tynemouth","region":"North East","pop":60605,"sun":1598,"rain":665,"sun6190":1369,"rain6190":638,"sun_chg_pct":16.8},{"name":"North Shields","region":"North East","pop":39747,"sun":1591,"rain":670,"sun6190":1362,"rain6190":643,"sun_chg_pct":16.7},{"name":"Cramlington","region":"North East","pop":33180,"sun":1555,"rain":685,"sun6190":1332,"rain6190":657,"sun_chg_pct":16.7},{"name":"South Shields","region":"North East","pop":83655,"sun":1587,"rain":638,"sun6190":1362,"rain6190":611,"sun_chg_pct":16.5},{"name":"Rotherham","region":"Yorkshire and the Humber","pop":117618,"sun":1520,"rain":661,"sun6190":1314,"rain6190":643,"sun_chg_pct":15.7},{"name":"Jarrow","region":"North East","pop":29470,"sun":1543,"rain":642,"sun6190":1335,"rain6190":614,"sun_chg_pct":15.6}],"lost":[{"name":"Dumfries","region":"Scotland","pop":46500,"sun":1288,"rain":1225,"sun6190":1328,"rain6190":1075,"sun_chg_pct":-3.0},{"name":"South Hayling","region":"South East","pop":15485,"sun":1750,"rain":737,"sun6190":1798,"rain6190":680,"sun_chg_pct":-2.7},{"name":"Hayling Island","region":"South East","pop":16887,"sun":1756,"rain":734,"sun6190":1805,"rain6190":677,"sun_chg_pct":-2.7},{"name":"Havant","region":"South East","pop":45574,"sun":1649,"rain":786,"sun6190":1682,"rain6190":733,"sun_chg_pct":-1.9},{"name":"Emsworth","region":"South East","pop":18777,"sun":1663,"rain":822,"sun6190":1693,"rain6190":754,"sun_chg_pct":-1.7}],"share_sunnier":0.981,"cities250k":[{"name":"Southend-on-Sea","region":"East of England","pop":295310,"sun":1780,"rain":526,"sun6190":1567,"rain6190":522,"sun_chg_pct":13.6},{"name":"Brighton","region":"South East","pop":283870,"sun":1764,"rain":782,"sun6190":1711,"rain6190":749,"sun_chg_pct":3.0},{"name":"Southampton","region":"South East","pop":269781,"sun":1684,"rain":842,"sun6190":1636,"rain6190":763,"sun_chg_pct":2.9},{"name":"Plymouth","region":"South West","pop":260203,"sun":1649,"rain":1036,"sun6190":1642,"rain6190":972,"sun_chg_pct":0.4},{"name":"Cardiff","region":"Wales","pop":372089,"sun":1620,"rain":1166,"sun6190":1495,"rain6190":1036,"sun_chg_pct":8.3},{"name":"Bristol","region":"South West","pop":479024,"sun":1611,"rain":883,"sun6190":1491,"rain6190":818,"sun_chg_pct":8.1},{"name":"Kingston upon Hull","region":"Yorkshire and the Humber","pop":314018,"sun":1582,"rain":683,"sun6190":1443,"rain6190":648,"sun_chg_pct":9.6},{"name":"Reading","region":"South East","pop":318014,"sun":1578,"rain":650,"sun6190":1514,"rain6190":634,"sun_chg_pct":4.3},{"name":"Islington","region":"London","pop":319143,"sun":1561,"rain":629,"sun6190":1454,"rain6190":612,"sun_chg_pct":7.3},{"name":"London","region":"London","pop":8961989,"sun":1559,"rain":618,"sun6190":1448,"rain6190":609,"sun_chg_pct":7.6},{"name":"Swansea","region":"Wales","pop":300352,"sun":1555,"rain":1262,"sun6190":1490,"rain6190":1265,"sun_chg_pct":4.4},{"name":"Coventry","region":"West Midlands","pop":345324,"sun":1519,"rain":675,"sun6190":1376,"rain6190":640,"sun_chg_pct":10.4},{"name":"Milton Keynes","region":"South East","pop":256385,"sun":1506,"rain":655,"sun6190":1366,"rain6190":628,"sun_chg_pct":10.2},{"name":"Sheffield","region":"Yorkshire and the Humber","pop":556500,"sun":1506,"rain":768,"sun6190":1311,"rain6190":750,"sun_chg_pct":14.8},{"name":"Birkenhead","region":"North West","pop":325264,"sun":1496,"rain":786,"sun6190":1410,"rain6190":749,"sun_chg_pct":6.1},{"name":"Newcastle upon Tyne","region":"North East","pop":300125,"sun":1488,"rain":678,"sun6190":1310,"rain6190":640,"sun_chg_pct":13.6},{"name":"Nottingham","region":"East Midlands","pop":323632,"sun":1480,"rain":638,"sun6190":1316,"rain6190":609,"sun_chg_pct":12.5},{"name":"Liverpool","region":"North West","pop":496770,"sun":1477,"rain":873,"sun6190":1396,"rain6190":822,"sun_chg_pct":5.8},{"name":"Birmingham","region":"West Midlands","pop":1157603,"sun":1475,"rain":750,"sun6190":1369,"rain6190":710,"sun_chg_pct":7.8},{"name":"Derby","region":"East Midlands","pop":270468,"sun":1464,"rain":699,"sun6190":1321,"rain6190":671,"sun_chg_pct":10.8},{"name":"Leicester","region":"East Midlands","pop":368600,"sun":1456,"rain":657,"sun6190":1286,"rain6190":618,"sun_chg_pct":13.2},{"name":"Wolverhampton","region":"West Midlands","pop":263700,"sun":1433,"rain":762,"sun6190":1331,"rain6190":712,"sun_chg_pct":7.7},{"name":"Edinburgh","region":"Scotland","pop":514990,"sun":1426,"rain":737,"sun6190":1348,"rain6190":652,"sun_chg_pct":5.8},{"name":"Preston","region":"North West","pop":313332,"sun":1407,"rain":1053,"sun6190":1345,"rain6190":999,"sun_chg_pct":4.7},{"name":"Stoke-on-Trent","region":"West Midlands","pop":258366,"sun":1403,"rain":861,"sun6190":1237,"rain6190":811,"sun_chg_pct":13.5},{"name":"Manchester","region":"North West","pop":568996,"sun":1370,"rain":907,"sun6190":1295,"rain6190":877,"sun_chg_pct":5.8},{"name":"Leeds","region":"Yorkshire and the Humber","pop":536280,"sun":1342,"rain":660,"sun6190":1253,"rain6190":660,"sun_chg_pct":7.1},{"name":"Bradford","region":"Yorkshire and the Humber","pop":366187,"sun":1326,"rain":876,"sun6190":1228,"rain6190":842,"sun_chg_pct":8.0},{"name":"Glasgow","region":"Scotland","pop":626410,"sun":1318,"rain":1045,"sun6190":1243,"rain6190":960,"sun_chg_pct":6.0},{"name":"Belfast","region":"Northern Ireland","pop":348005,"sun":1271,"rain":982,"sun6190":1270,"rain6190":934,"sun_chg_pct":0.1}]},"town_lookup":{"London":{"sun":1559,"rain":618,"sun6190":1448,"rain6190":609,"sun_chg_pct":7.6,"class":[0,2],"sun_m":[52,72,117,165,196,192,202,195,148,108,63,48],"rain_m":[58,44,37,42,45,53,44,54,50,67,65,59],"tmax_m":[8.6,9.1,11.7,15.0,18.4,21.4,23.6,23.2,20.1,15.8,11.5,8.9]},"Manchester":{"sun":1370,"rain":907,"sun6190":1295,"rain6190":877,"sun_chg_pct":5.8,"class":[1,1],"sun_m":[44,66,105,151,184,169,176,157,128,92,56,45],"rain_m":[78,67,61,56,59,72,81,80,78,92,86,96],"tmax_m":[7.9,8.9,10.8,13.6,16.7,19.4,21.0,20.7,18.0,14.6,10.6,8.3]},"Glasgow":{"sun":1318,"rain":1045,"sun6190":1243,"rain6190":960,"sun_chg_pct":6.0,"class":[1,1],"sun_m":[40,69,102,147,193,160,160,150,118,88,55,36],"rain_m":[112,91,76,57,64,67,78,84,87,110,104,115],"tmax_m":[7.4,8.1,9.7,12.6,15.6,18.1,19.5,19.1,16.8,13.3,9.8,7.6]},"Cardiff":{"sun":1620,"rain":1166,"sun6190":1495,"rain6190":1036,"sun_chg_pct":8.3,"class":[1,2],"sun_m":[53,78,126,173,206,208,212,189,154,106,65,50],"rain_m":[123,88,82,70,76,74,84,100,82,124,126,135],"tmax_m":[8.6,9.0,11.2,14.3,17.2,19.8,21.6,21.2,19.0,15.1,11.6,9.1]},"Belfast":{"sun":1271,"rain":982,"sun6190":1270,"rain6190":934,"sun_chg_pct":0.1,"class":[1,0],"sun_m":[41,65,100,144,185,155,147,143,113,85,54,37],"rain_m":[94,74,77,62,62,71,76,85,73,98,107,102],"tmax_m":[8.1,8.7,10.6,13.0,16.1,18.6,20.0,19.7,17.5,13.7,10.4,8.4]},"Edinburgh":{"sun":1426,"rain":737,"sun6190":1348,"rain6190":652,"sun_chg_pct":5.8,"class":[0,1],"sun_m":[54,81,115,154,193,161,166,157,129,97,72,48],"rain_m":[65,52,49,43,50,68,72,74,56,76,66,66],"tmax_m":[7.1,7.8,9.6,12.0,15.0,17.5,19.4,19.1,16.9,13.2,9.7,7.2]},"Birmingham":{"sun":1475,"rain":750,"sun6190":1369,"rain6190":710,"sun_chg_pct":7.8,"class":[0,1],"sun_m":[52,72,112,148,185,183,193,175,138,102,62,52],"rain_m":[64,52,49,54,57,71,59,64,60,72,73,74],"tmax_m":[7.3,7.9,10.4,13.3,16.6,19.5,21.6,21.2,18.4,14.1,10.1,7.6]},"Brighton":{"sun":1764,"rain":782,"sun6190":1711,"rain6190":749,"sun_chg_pct":3.0,"class":[0,2],"sun_m":[59,82,129,189,222,224,236,217,161,118,72,54],"rain_m":[83,58,48,45,44,49,54,60,58,91,99,92],"tmax_m":[8.0,8.3,10.3,13.3,16.3,19.0,20.9,21.0,18.8,15.4,11.5,8.7]},"Bournemouth":{"sun":1837,"rain":877,"sun6190":1761,"rain6190":790,"sun_chg_pct":4.3,"class":[1,2],"sun_m":[64,88,134,193,230,237,245,221,171,120,79,56],"rain_m":[94,67,60,58,51,56,48,60,70,100,108,105],"tmax_m":[8.6,8.7,11.0,13.6,16.6,19.2,21.3,21.2,18.9,15.4,11.7,9.1]},"Fort William":{"sun":927,"rain":2405,"sun6190":912,"rain6190":2116,"sun_chg_pct":1.6,"class":[2,0],"sun_m":[19,49,72,121,161,130,99,105,77,53,26,15],"rain_m":[310,232,199,141,128,119,138,160,193,257,238,288],"tmax_m":[6.5,7.1,8.4,11.3,14.3,16.3,17.6,17.3,15.0,11.8,8.8,6.1]},"Aberdeen":{"sun":1518,"rain":763,"sun6190":1438,"rain6190":717,"sun_chg_pct":5.6,"class":[0,1],"sun_m":[62,87,132,159,212,174,173,168,132,98,70,52],"rain_m":[64,55,49,52,49,61,67,65,55,91,83,72],"tmax_m":[6.9,7.4,9.0,10.7,13.2,15.5,17.7,17.6,15.8,12.5,9.4,7.1]},"Swansea":{"sun":1555,"rain":1262,"sun6190":1490,"rain6190":1265,"sun_chg_pct":4.4,"class":[2,2],"sun_m":[57,78,119,168,203,196,192,177,144,103,66,52],"rain_m":[134,96,90,73,73,75,92,105,97,138,146,143],"tmax_m":[8.4,8.7,10.5,13.4,16.4,18.9,20.6,20.4,18.3,14.8,11.4,9.1]},"Plymouth":{"sun":1649,"rain":1036,"sun6190":1642,"rain6190":972,"sun_chg_pct":0.4,"class":[1,2],"sun_m":[58,82,123,180,213,211,203,189,153,111,72,53],"rain_m":[112,86,75,68,61,63,68,81,67,113,118,124],"tmax_m":[9.0,9.1,10.8,13.4,16.2,18.6,20.6,20.4,18.4,15.0,11.8,9.5]},"Norwich":{"sun":1579,"rain":666,"sun6190":1462,"rain6190":624,"sun_chg_pct":8.0,"class":[0,2],"sun_m":[56,76,114,173,201,187,202,194,149,108,67,50],"rain_m":[55,47,46,39,47,57,57,64,56,66,69,62],"tmax_m":[7.3,7.9,10.3,13.5,16.8,19.8,22.5,22.4,19.1,14.8,10.7,7.6]}},"change":{"share_sunnier":0.917,"share_sunnier5":0.544,"share_duller":0.083,"share_wetter":0.985,"share_wetter5":0.692,"share_drier":0.015,"sun_pct_p10":0.5,"sun_pct_p90":10.8,"sun_pct_max":18.8,"sun_pct_min":-6.4,"rain_pct_p10":2.8,"rain_pct_p90":11.1,"sunnier_and_wetter":0.903,"sunnier_and_drier":0.014,"duller_and_wetter":0.082,"duller_and_drier":0.001,"rho_change":-0.32,"max_cell":{"near":"Knock","county":"Westmorland and Furness","km":6.4,"e_km":371.5,"n_km":532.5,"region":"North West","pct":18.8},"min_cell":{"near":"Poolewe","county":"Highland","km":2.7,"e_km":185.5,"n_km":883.5,"region":"Scotland","pct":-6.4},"area_over_1500":[40442,95245],"area_over_1600":[9881,42725],"area_over_1700":[2056,10426],"by_northing":[{"n_from":0,"n_to":100,"km2":8976,"sun_chg_pct":3.1,"rain_chg_pct":6.6,"sun":1641.0},{"n_from":100,"n_to":200,"km2":33773,"sun_chg_pct":6.5,"rain_chg_pct":6.4,"sun":1628.0},{"n_from":200,"n_to":300,"km2":41377,"sun_chg_pct":7.4,"rain_chg_pct":6.1,"sun":1530.0},{"n_from":300,"n_to":400,"km2":33047,"sun_chg_pct":7.4,"rain_chg_pct":5.0,"sun":1482.0},{"n_from":400,"n_to":500,"km2":22049,"sun_chg_pct":6.9,"rain_chg_pct":5.1,"sun":1407.0},{"n_from":500,"n_to":600,"km2":31652,"sun_chg_pct":4.3,"rain_chg_pct":7.9,"sun":1320.0},{"n_from":600,"n_to":700,"km2":20433,"sun_chg_pct":3.1,"rain_chg_pct":9.9,"sun":1299.0},{"n_from":700,"n_to":800,"km2":20907,"sun_chg_pct":2.8,"rain_chg_pct":10.4,"sun":1175.0},{"n_from":800,"n_to":900,"km2":21006,"sun_chg_pct":3.8,"rain_chg_pct":7.4,"sun":1162.0},{"n_from":900,"n_to":1000,"km2":9598,"sun_chg_pct":5.1,"rain_chg_pct":6.2,"sun":1132.0},{"n_from":1000,"n_to":1100,"km2":814,"sun_chg_pct":7.2,"rain_chg_pct":4.3,"sun":1213.0},{"n_from":1100,"n_to":1200,"km2":1294,"sun_chg_pct":9.0,"rain_chg_pct":2.2,"sun":1110.0}],"top_sun_class_area":[26992,81886],"breaks_6190":{"sun3":[1255.0,1424.0],"rain3":[767.0,1153.0]}},"coast":{"bands":[{"from_km":0,"to_km":2,"km2":19140,"sun":1418.0,"rain":1277.0},{"from_km":2,"to_km":5,"km2":24233,"sun":1410.0,"rain":1340.0},{"from_km":5,"to_km":10,"km2":25465,"sun":1413.0,"rain":1300.0},{"from_km":10,"to_km":20,"km2":39919,"sun":1404.0,"rain":1267.0},{"from_km":20,"to_km":40,"km2":59012,"sun":1394.0,"rain":1176.0},{"from_km":40,"to_km":80,"km2":54713,"sun":1419.0,"rain":961.0},{"from_km":80,"to_km":200,"km2":8269,"sun":1516.0,"rain":702.0}],"sun_coast2":1418.0,"sun_inland20":1413.0,"coast_premium_pct":0.3,"top1_within5":0.798,"land_within5":0.188,"top5_within5":0.487,"top1_regions":[{"region":"South East","share":0.821},{"region":"South West","share":0.121},{"region":"East of England","share":0.058}],"top1_threshold":1797.0,"by_nation":{"England":{"coast2":1684.0,"inland20":1505.0},"Scotland":{"coast2":1260.0,"inland20":1173.0},"Wales":{"coast2":1578.0,"inland20":1331.0}},"bands_nation":{"England":[1684.0,1645.0,1596.0,1557.0,1520.0,1491.0,1516.0],"Scotland":[1260.0,1227.0,1205.0,1196.0,1186.0,1148.0,null],"Wales":[1578.0,1525.0,1460.0,1402.0,1329.0,1336.0,null]}},"months":[{"month":"January","sun":47.0,"rain":121.0,"tmax":6.7,"sun_England":55.0,"sun_Scotland":35.0,"sun_Wales":47.0,"sun_Northern Ireland":43.0,"rain_England":83.0,"rain_Scotland":177.0,"rain_Wales":154.0,"rain_Northern Ireland":115.0},{"month":"February","sun":72.0,"rain":96.0,"tmax":7.2,"sun_England":78.0,"sun_Scotland":64.0,"sun_Wales":69.0,"sun_Northern Ireland":67.0,"rain_England":66.0,"rain_Scotland":140.0,"rain_Wales":120.0,"rain_Northern Ireland":91.0},{"month":"March","sun":109.0,"rain":85.0,"tmax":9.2,"sun_England":117.0,"sun_Scotland":98.0,"sun_Wales":110.0,"sun_Northern Ireland":101.0,"rain_England":58.0,"rain_Scotland":124.0,"rain_Wales":103.0,"rain_Northern Ireland":87.0},{"month":"April","sun":155.0,"rain":72.0,"tmax":12.0,"sun_England":164.0,"sun_Scotland":142.0,"sun_Wales":158.0,"sun_Northern Ireland":148.0,"rain_England":56.0,"rain_Scotland":93.0,"rain_Wales":88.0,"rain_Northern Ireland":74.0},{"month":"May","sun":192.0,"rain":71.0,"tmax":15.1,"sun_England":199.0,"sun_Scotland":183.0,"sun_Wales":191.0,"sun_Northern Ireland":184.0,"rain_England":57.0,"rain_Scotland":89.0,"rain_Wales":87.0,"rain_Northern Ireland":74.0},{"month":"June","sun":172.0,"rain":77.0,"tmax":17.7,"sun_England":188.0,"sun_Scotland":147.0,"sun_Wales":178.0,"sun_Northern Ireland":151.0,"rain_England":65.0,"rain_Scotland":93.0,"rain_Wales":92.0,"rain_Northern Ireland":81.0},{"month":"July","sun":173.0,"rain":82.0,"tmax":19.6,"sun_England":197.0,"sun_Scotland":141.0,"sun_Wales":177.0,"sun_Northern Ireland":137.0,"rain_England":66.0,"rain_Scotland":103.0,"rain_Wales":98.0,"rain_Northern Ireland":89.0},{"month":"August","sun":162.0,"rain":94.0,"tmax":19.3,"sun_England":181.0,"sun_Scotland":135.0,"sun_Wales":160.0,"sun_Northern Ireland":137.0,"rain_England":75.0,"rain_Scotland":120.0,"rain_Wales":111.0,"rain_Northern Ireland":99.0},{"month":"September","sun":128.0,"rain":91.0,"tmax":16.8,"sun_England":141.0,"sun_Scotland":107.0,"sun_Wales":130.0,"sun_Northern Ireland":113.0,"rain_England":68.0,"rain_Scotland":123.0,"rain_Wales":111.0,"rain_Northern Ireland":87.0},{"month":"October","sun":92.0,"rain":123.0,"tmax":13.1,"sun_England":103.0,"sun_Scotland":75.0,"sun_Wales":92.0,"sun_Northern Ireland":86.0,"rain_England":90.0,"rain_Scotland":168.0,"rain_Wales":158.0,"rain_Northern Ireland":114.0},{"month":"November","sun":58.0,"rain":123.0,"tmax":9.4,"sun_England":65.0,"sun_Scotland":48.0,"sun_Wales":55.0,"sun_Northern Ireland":55.0,"rain_England":92.0,"rain_Scotland":165.0,"rain_Wales":162.0,"rain_Northern Ireland":122.0},{"month":"December","sun":43.0,"rain":127.0,"tmax":7.0,"sun_England":51.0,"sun_Scotland":30.0,"sun_Wales":41.0,"sun_Northern Ireland":38.0,"rain_England":92.0,"rain_Scotland":174.0,"rain_Wales":175.0,"rain_Northern Ireland":121.0}],"month_stats":{"sunniest_month_uk":"May","dullest_month_uk":"December","wettest_month_uk":"December","driest_month_uk":"May","sunniest_month_share":{"May":0.722,"June":0.004,"July":0.273,"August":0.0},"wettest_month_share":{"January":0.149,"February":0.001,"May":0.0,"June":0.014,"July":0.011,"August":0.044,"September":0.0,"October":0.263,"November":0.236,"December":0.282},"driest_month_share":{"January":0.0,"February":0.029,"March":0.251,"April":0.246,"May":0.304,"June":0.118,"July":0.05,"August":0.001,"September":0.001,"October":0.0,"December":0.0},"dec_sun_max":67.0,"dec_sun_min":9.0,"jun_sun_max":253.0,"jun_sun_min":106.0,"dec_dullest":{"near":"North Roe","county":"Shetland Islands","km":5.7,"e_km":431.5,"n_km":1191.5,"region":"Scotland","sun":9.0},"dec_sunniest":{"near":"Ventnor","county":"Isle of Wight","km":1.0,"e_km":456.5,"n_km":78.5,"region":"South East","sun":67.0},"jun_sunniest":{"near":"Dungeness","county":"Kent","km":0.3,"e_km":609.5,"n_km":117.5,"region":"South East","sun":253.0}},"seasons":{"winter":{"sun":162.0,"rain":345.0,"sun_max":236.0,"sun_min":60.0,"rain_max":1532.0,"rain_min":100.0,"rho":-0.79},"spring":{"sun":457.0,"rain":228.0,"sun_max":602.0,"sun_min":304.0,"rain_max":895.0,"rain_min":90.0,"rho":-0.67},"summer":{"sun":507.0,"rain":253.0,"sun_max":766.0,"sun_min":281.0,"rain_max":997.0,"rain_min":118.0,"rho":-0.76},"autumn":{"sun":277.0,"rain":337.0,"sun_max":399.0,"sun_min":127.0,"rain_max":1432.0,"rain_min":129.0,"rho":-0.73},"winter_rain_share":0.297,"summer_sun_share":0.361,"winter_share_dry_tercile":0.25,"winter_share_wet_tercile":0.317},"pleasant":{"18_27":{"hist":[61822,11899,55885,25688,88410,1373,0,0,0,0,0,0,0],"share_zero":0.252,"max":5,"mean":2.29},"20_27":{"hist":[135751,7731,70454,30277,864,0,0,0,0,0,0,0,0],"share_zero":0.554,"max":4,"mean":0.99},"15_25":{"hist":[6648,2870,16543,21460,59288,108610,29313,345,0,0,0,0,0],"share_zero":0.027,"max":7,"mean":4.32},"16_27":{"hist":[15577,5002,31836,30165,68772,93594,131,0,0,0,0,0,0],"share_zero":0.064,"max":6,"mean":3.68},"tmax_july_max":23.9,"tmax_july_min":9.5,"warmest_july":{"near":"London","county":"Greater London","km":3.2,"e_km":529.5,"n_km":183.5,"region":"London","tmax":23.9},"london_months_18":5}};
+const GM = {"x0_km": -2, "y_top_km": 1220, "width": 660, "height": 1214};
+const NS = "http://www.w3.org/2000/svg";
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const el = (t, a = {}, p) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const fmt = n => n == null || isNaN(n) ? "n/a" : Math.round(n).toLocaleString("en-GB");
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const tip = document.getElementById("tip");
+function showTip(h, x, y) { tip.innerHTML = h; tip.style.display = "block"; const w = tip.offsetWidth; x = Math.max(w / 2 + 8, Math.min(innerWidth - w / 2 - 8, x)); tip.style.left = x + scrollX + "px"; tip.style.top = y + scrollY + "px"; }
+function hideTip() { tip.style.display = "none"; }
+function hover(node, h) { node.style.cursor = "pointer"; node.setAttribute("tabindex", "0"); const s = () => { const r = node.getBoundingClientRect(); showTip(h, r.left + r.width / 2, r.top); }; node.addEventListener("pointerenter", s); node.addEventListener("pointerleave", hideTip); node.addEventListener("focus", s); node.addEventListener("blur", hideTip); }
+const redraws = [];
+function resp(box, render) { let last = 0; const go = (force) => { const w = Math.max(280, Math.round(box.clientWidth)); if (!force && Math.abs(w - last) < 4) return; last = w; box.innerHTML = ""; render(w, w < 560); }; new ResizeObserver(() => go()).observe(box); go(); redraws.push(() => go(true)); }
+const lbl = (svg, x, y, s, cls = "lab", anchor = "start") => { const t = el("text", { x, y, class: cls, "text-anchor": anchor }, svg); t.textContent = s; return t; };
+const isDark = () => { const r = document.documentElement; return r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+document.getElementById("theme").onclick = () => { const r = document.documentElement; r.dataset.theme = isDark() ? "light" : "dark"; redraws.forEach(f => f()); };
+const MON = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const SEAS = { winter: [11, 0, 1], spring: [2, 3, 4], summer: [5, 6, 7], autumn: [8, 9, 10] };
+const REG = ["North East", "North West", "Yorkshire and the Humber", "East Midlands", "West Midlands", "East of England", "London", "South East", "South West", "Wales", "Scotland", "Northern Ireland"];
+(() => { const s = document.getElementById("when"); MON.forEach((m, i) => { const o = document.createElement("option"); o.value = "m:" + i; o.textContent = m; s.appendChild(o); }); })();
+
+/* hero mark: the 3 by 3 key, filling in one square at a time */
+(() => { const g = document.getElementById("heroMark"), P = R.palette["3"]; const cells = [];
+  for (let r = 0; r < 3; r++) for (let s = 0; s < 3; s++) cells.push(el("rect", { x: 6 + s * 37, y: 80 - r * 37, width: 34, height: 34, fill: P[r][s] }, g));
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let i = 0; setInterval(() => { cells.forEach((c, k) => c.setAttribute("opacity", k === i % 9 ? 1 : .88)); cells.forEach((c, k) => c.setAttribute("transform", k === i % 9 ? `translate(0 -3)` : "")); i++; }, 900);
+})();
+
+/* ===== grids ===== */
+const W = GM.width, H = GM.height, NPX = W * H;
+const D = { land: null, sunA: null, rainA: null, tmaxA: null, sun6: null, rain6: null, dS: null, dR: null, reg: null, sunM: [], rainM: [], tmaxM: [] };
+const LN = Math.log;
+const dec = {
+  sunA: v => 600 + (v - 1) * 6, rainA: v => Math.exp(LN(400) + (v - 1) / 254 * (LN(6000) - LN(400))),
+  sunM: v => (v - 1) * 1.2, rainM: v => Math.exp(LN(15) + (v - 1) / 254 * (LN(800) - LN(15))), tmax: v => (v - 1) / 8 - 5, chg: v => (v - 127) / 4
+};
+async function pixels(url) {
+  const blob = await (await fetch(url)).blob();
+  let src;
+  try { src = await createImageBitmap(blob, { colorSpaceConversion: "none", premultiplyAlpha: "none" }); }
+  catch (e) { src = await new Promise((ok, no) => { const im = new Image(); im.onload = () => ok(im); im.onerror = no; im.src = URL.createObjectURL(blob); }); }
+  const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d", { willReadFrequently: true });
+  x.drawImage(src, 0, 0); return x.getImageData(0, 0, W, H).data;
+}
+function channel(px, ch, f) { const out = new Float32Array(NPX); for (let i = 0; i < NPX; i++) { const v = px[i * 4 + ch]; out[i] = v ? f(v) : NaN; } return out; }
+const msg = document.getElementById("loadMsg");
+async function loadBase() {
+  msg.textContent = "Loading the 1 km grids...";
+  const [a, b, c, g] = await Promise.all(["ann9120", "ann6190", "change", "regions"].map(n => pixels(`data/grid/${n}.png`)));
+  D.sunA = channel(a, 0, dec.sunA); D.rainA = channel(a, 1, dec.rainA); D.tmaxA = channel(a, 2, dec.tmax);
+  D.sun6 = channel(b, 0, dec.sunA); D.rain6 = channel(b, 1, dec.rainA);
+  D.dS = channel(c, 0, dec.chg); D.dR = channel(c, 1, dec.chg);
+  D.reg = new Uint8Array(NPX); for (let i = 0; i < NPX; i++) D.reg[i] = g[i * 4];
+  D.land = []; for (let i = 0; i < NPX; i++) if (!isNaN(D.sunA[i])) D.land.push(i); D.land = Int32Array.from(D.land);
+  msg.textContent = "";
+}
+let monthsP = null;
+function loadMonths() {
+  if (monthsP) return monthsP;
+  msg.textContent = "Loading the monthly grids...";
+  monthsP = Promise.all(MON.map((_, m) => pixels(`data/grid/m${String(m + 1).padStart(2, "0")}.png`).then(px => {
+    D.sunM[m] = channel(px, 0, dec.sunM); D.rainM[m] = channel(px, 1, dec.rainM); D.tmaxM[m] = channel(px, 2, dec.tmax);
+  }))).then(() => { msg.textContent = ""; });
+  return monthsP;
+}
+
+/* ===== state ===== */
+const S = { per: "now", when: "ann", n: 3, mode: "q", fixed: null, hl: null, twin: null, sel: null };
+let VX = null, VY = null;  // current sun-like and rain-like values
+function viewArrays() {
+  if (S.per === "chg") return [D.dS, D.dR];
+  if (S.per === "then") return [D.sun6, D.rain6];
+  if (S.when === "ann") return [D.sunA, D.rainA];
+  const ms = S.when.startsWith("m:") ? [+S.when.slice(2)] : SEAS[S.when.slice(2)];
+  const a = new Float32Array(NPX).fill(NaN), b = new Float32Array(NPX).fill(NaN);
+  for (const i of D.land) { let s = 0, r = 0; for (const m of ms) { s += D.sunM[m][i]; r += D.rainM[m][i]; } a[i] = s; b[i] = r; }
+  return [a, b];
+}
+function quant(arr, n) { const v = []; for (let k = 0; k < D.land.length; k += 3) v.push(arr[D.land[k]]); v.sort((a, b) => a - b); const o = []; for (let k = 1; k < n; k++) o.push(v[Math.floor(v.length * k / n)]); return o; }
+function range(arr) { let lo = Infinity, hi = -Infinity; for (const i of D.land) { const v = arr[i]; if (v < lo) lo = v; if (v > hi) hi = v; } return [lo, hi]; }
+let BR = { x: [], y: [] }, RX = [0, 1], RY = [0, 1];
+function setBreaks() {
+  RX = range(VX); RY = range(VY);
+  if (S.mode === "q" || !S.fixed || S.fixed.n !== S.n || S.fixed.key !== breakKey()) { BR = { x: quant(VX, S.n), y: quant(VY, S.n) }; if (S.mode === "f") S.fixed = { n: S.n, key: breakKey(), x: BR.x.map(nice), y: BR.y.map(nice) }; }
+  if (S.mode === "f") BR = { x: S.fixed.x.slice(), y: S.fixed.y.slice() };
+}
+function nice(v) { const m = Math.pow(10, Math.floor(Math.log10(Math.abs(v) || 1)) - 1); return Math.round(v / m) * m; }
+function breakKey() { return S.per === "chg" ? "chg" : S.when; }   // fixed breaks carry across 1961 to 1990 and 1991 to 2020
+const cls = (v, b) => { let k = 0; while (k < b.length && v >= b[k]) k++; return k; };
+function hex(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
+const CW = { now: ["dull and dry", "sunny and dry", "dull and wet", "sunny and wet"], chg: ["small sun gain, small rain gain", "big sun gain, small rain gain", "small sun gain, big rain gain", "big sun gain, big rain gain"] };
+function className(r, s) {
+  const n = S.n, w = S.per === "chg" ? CW.chg : CW.now;
+  if (r === 0 && s === 0) return w[0]; if (r === 0 && s === n - 1) return w[1]; if (r === n - 1 && s === 0) return w[2]; if (r === n - 1 && s === n - 1) return w[3];
+  const sn = S.per === "chg" ? ["small sun gain", "modest sun gain", "larger sun gain", "big sun gain"] : ["dull", "fairly dull", "fairly sunny", "sunny"];
+  const rn = S.per === "chg" ? ["small rain gain", "modest rain gain", "larger rain gain", "big rain gain"] : ["dry", "fairly dry", "fairly wet", "wet"];
+  const si = n === 3 ? [0, 1, 3][s] : s, ri = n === 3 ? [0, 1, 3][r] : r;
+  return (n === 3 && s === 1 ? (S.per === "chg" ? "middling sun gain" : "middling sun") : sn[si]) + ", " + (n === 3 && r === 1 ? (S.per === "chg" ? "middling rain gain" : "middling rain") : rn[ri]);
+}
+
+/* ===== map ===== */
+const cv = document.createElement("canvas"); cv.width = W; cv.height = H; const cx = cv.getContext("2d");
+const img = cx.createImageData(W, H);
+let CL = null;  // class index per pixel
+function render() {
+  if (!D.land) return;
+  const P = R.palette[S.n].map(row => row.map(hex)), d = img.data, fade = isDark() ? [62, 57, 66] : [212, 207, 199];
+  CL = new Int16Array(NPX).fill(-1);
+  d.fill(0);
+  let twin = null;
+  if (S.twin) { const [a, b] = [D.sunA, D.rainA]; twin = i => Math.abs(a[i] / S.twin.s - 1) <= S.twin.tol && Math.abs(b[i] / S.twin.r - 1) <= S.twin.tol; }
+  let nOn = 0;
+  for (const i of D.land) {
+    const s = cls(VX[i], BR.x), r = cls(VY[i], BR.y); CL[i] = r * 10 + s;
+    let c = P[r][s];
+    const on = twin ? twin(i) : S.hl ? (S.hl[0] === r && S.hl[1] === s) : true;
+    if (!on) c = fade; else nOn++;
+    d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = 255;
+  }
+  // a pale class on a pale map is hard to see: outline the lit squares when the lit colour is light
+  if (S.hl && !twin) { const c = P[S.hl[0]][S.hl[1]]; if (.2126 * c[0] + .7152 * c[1] + .0722 * c[2] > 200) {
+    const on = i => CL[i] === S.hl[0] * 10 + S.hl[1], ink = isDark() ? [255, 255, 255] : [30, 27, 34];
+    for (const i of D.land) if (on(i) && (!on(i - 1) || !on(i + 1) || !on(i - W) || !on(i + W))) { d[i * 4] = ink[0]; d[i * 4 + 1] = ink[1]; d[i * 4 + 2] = ink[2]; } } }
+  cx.putImageData(img, 0, 0);
+  if (S.twin) { S.twin.km2 = nOn; twinNote(); }
+  drawDens(); legendHL();
+}
+function renderAll() { render(); legend(); sliders(); ranking(); }
+let lmap, overlay, pin;
+const CanvasOverlay = window.L && L.ImageOverlay.extend({
+  _initImage() { const c = this._image = this._url; L.DomUtil.addClass(c, "leaflet-image-layer"); L.DomUtil.addClass(c, "px"); if (this._zoomAnimated) L.DomUtil.addClass(c, "leaflet-zoom-animated"); c.onselectstart = L.Util.falseFn; c.onmousemove = L.Util.falseFn; },
+  redraw() {}
+});
+const ll = (e, n) => L.latLng(n, e);  // CRS.Simple: lat = northing km, lng = easting km
+const pxOf = (e, n) => { const i = Math.floor(e - GM.x0_km), j = Math.floor(GM.y_top_km - n); return (i < 0 || j < 0 || i >= W || j >= H) ? -1 : j * W + i; };
+const enOf = p => [GM.x0_km + (p % W) + .5, GM.y_top_km - Math.floor(p / W) - .5];
+const CITIES = [["London", 530.2, 180.5], ["Birmingham", 406.9, 287.1], ["Manchester", 384.3, 398.3], ["Leeds", 429.9, 433.4], ["Newcastle", 424.8, 564.4], ["Glasgow", 258.8, 665.9], ["Edinburgh", 325.4, 673.9], ["Aberdeen", 394.2, 805.9], ["Inverness", 266.7, 845.4], ["Fort William", 210.1, 773.8], ["Cardiff", 318.2, 176.3], ["Swansea", 265.6, 193.1], ["Plymouth", 247.7, 54.6], ["Norwich", 623.3, 308.4], ["Belfast", 146.5, 529.5], ["Derry", 60.6, 580.0], ["Southampton", 442.0, 111.8], ["Dover", 631.9, 141.5], ["Penzance", 147.2, 30.3], ["Lerwick", 447.5, 1141.4], ["Stornoway", 142.4, 932.7], ["Liverpool", 335.1, 390.9], ["Hull", 509.9, 428.9], ["Carlisle", 339.9, 556.0], ["Aberystwyth", 258.4, 281.8], ["Oban", 185.9, 729.8], ["Ventnor", 456.3, 77.6]];
+function nearestName(e, n) {
+  let best = null, bd = 1e9; for (const p of PLACES || []) { if (p[4] < 1) continue; const d = (p[2] - e) ** 2 + (p[3] - n) ** 2; if (d < bd) { bd = d; best = p; } }
+  return best ? `${best[0]}${Math.sqrt(bd) > 3 ? " (" + Math.round(Math.sqrt(bd)) + " km)" : ""}` : "";
+}
+function readSquare(p) {
+  if (p < 0 || isNaN(VX[p])) return null;
+  const [e, n] = enOf(p), r = Math.floor(CL[p] / 10), s = CL[p] % 10, P = R.palette[S.n];
+  const units = S.per === "chg" ? ["% sunshine", "% rain"] : ["hours of sun", "mm of rain"];
+  const v = S.per === "chg" ? [(VX[p] >= 0 ? "+" : "") + VX[p].toFixed(1), (VY[p] >= 0 ? "+" : "") + VY[p].toFixed(1)] : [fmt(VX[p]), fmt(VY[p])];
+  return `<b>${esc(nearestName(e, n) || "Square")}</b> · ${REG[D.reg[p] - 1] || ""}<br><span class="sw" style="background:${P[r][s]}"></span>${className(r, s)}<br>${v[0]} ${units[0]} · ${v[1]} ${units[1]}${S.per !== "chg" && S.when !== "ann" && S.per === "now" ? " (" + document.getElementById("when").selectedOptions[0].textContent.toLowerCase() + ")" : ""}`;
+}
+function initMap() {
+  if (!window.L) { document.getElementById("lmap").innerHTML = '<p style="padding:16px">The map library did not load.</p>'; return; }
+  const b = [ll(GM.x0_km, GM.y_top_km - H), ll(GM.x0_km + W, GM.y_top_km)];
+  lmap = L.map("lmap", { crs: L.CRS.Simple, zoomSnap: .25, zoomDelta: .5, minZoom: -2, maxZoom: 5, scrollWheelZoom: false, attributionControl: true, maxBounds: L.latLngBounds(b).pad(.3) });
+  lmap.fitBounds(b, { paddingTopLeft: [4, 4], paddingBottomRight: [4, innerWidth < 600 ? 56 : 30] });
+  lmap.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+  lmap.createPane("ctx").style.zIndex = 300;
+  fetch("data/coast_bng.json").then(r => r.json()).then(gj => {
+    L.geoJSON({ type: "GeometryCollection", geometries: gj }, { pane: "ctx", coordsToLatLng: c => ll(c[0], c[1]), style: () => ({ stroke: false, fillColor: css("--ctx"), fillOpacity: 1 }), interactive: false }).addTo(lmap);
+  });
+  overlay = new CanvasOverlay(cv, b, { attribution: "Contains Met Office data © Crown copyright 2026 (OGL v3) | OS Open Names, GeoNames | Natural Earth" }).addTo(lmap);
+  const T2 = new Set(["Leeds", "Hull", "Liverpool", "Carlisle", "Aberystwyth", "Swansea", "Derry", "Dover", "Penzance", "Oban", "Ventnor", "Southampton"]);
+  L.layerGroup(CITIES.map(([nm, e, n]) => L.marker(ll(e, n), { interactive: false, icon: L.divIcon({ className: "city" + (T2.has(nm) ? " t2" : ""), html: `<i></i>${nm}`, iconSize: null, iconAnchor: [3, 6] }) }))).addTo(lmap);
+  const zc = () => lmap.getContainer().classList.toggle("zlo", lmap.getZoom() < -0.3); lmap.on("zoomend", zc); zc();
+  lmap.on("click", () => lmap.scrollWheelZoom.enable());
+  lmap.on("mousemove", ev => { const p = pxOf(ev.latlng.lng, ev.latlng.lat); const h = readSquare(p); document.getElementById("hov").innerHTML = h || "Hover or tap the map to read a square."; });
+  lmap.on("click", ev => { const p = pxOf(ev.latlng.lng, ev.latlng.lat); if (p >= 0 && !isNaN(D.sunA[p])) { document.getElementById("hov").innerHTML = readSquare(p); choose({ name: nearestName(ev.latlng.lng, ev.latlng.lat) || "This square", e: ev.latlng.lng, n: ev.latlng.lat, how: "map" }, false); } });
+}
+
+/* ===== legend: the key with words at the corners, and the density chart ===== */
+function legend() {
+  const box = document.getElementById("legend"), n = S.n, P = R.palette[n], w = S.per === "chg" ? CW.chg : CW.now;
+  box.innerHTML = "";
+  const g = document.createElement("div"); g.className = "lgrid"; g.style.gridTemplateColumns = `repeat(${n},${n === 3 ? 46 : 36}px)`;
+  for (let r = n - 1; r >= 0; r--) for (let s = 0; s < n; s++) {
+    const c = document.createElement("div"); c.style.background = P[r][s]; c.title = className(r, s); c.dataset.rs = r + "," + s;
+    if (n === 4) { c.style.width = "36px"; c.style.height = "32px"; }
+    c.onpointerenter = () => { if (S.lockHl) return; S.hl = [r, s]; S.twin = null; render(); };
+    c.onpointerleave = () => { if (!S.lockHl) { S.hl = null; render(); } };
+    c.onclick = () => { const same = S.hl && S.hl[0] === r && S.hl[1] === s && S.lockHl; S.lockHl = !same; S.hl = same ? null : [r, s]; S.twin = null; render(); };
+    g.appendChild(c);
+  }
+  const side = (a, b, al) => { const d = document.createElement("div"); d.className = "corner"; d.style.cssText = `display:flex;flex-direction:column;justify-content:space-between;align-self:stretch;text-align:${al};padding:2px 0`; d.innerHTML = `<div>${a}</div><div>${b}</div>`; return d; };
+  const wrap = document.createElement("div"); wrap.style.cssText = "display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:stretch";
+  wrap.append(side(w[2], w[0], "right"), g, side(w[3], w[1], "left")); box.appendChild(wrap);
+  const ax = document.createElement("div"); ax.className = "axis"; ax.style.marginTop = "6px";
+  ax.textContent = S.per === "chg" ? "Across: change in sunshine. Up: change in rainfall. Tap a square to keep it lit; tap again to clear." : "Across: more sunshine. Up: more rain. Tap a square to keep it lit; tap again to clear.";
+  box.appendChild(ax);
+  document.getElementById("keyTitle").textContent = S.per === "chg" ? "Key: change, 1961 to 1990 to 1991 to 2020" : (S.per === "then" ? "Key: 1961 to 1990" : "Key: 1991 to 2020") + ". Hover a colour";
+  legendHL();
+}
+function legendHL() { document.querySelectorAll("#legend .lgrid div").forEach(c => c.classList.toggle("on", !!S.hl && c.dataset.rs === S.hl.join(","))); }
+const DC = document.getElementById("dens"), dx = DC.getContext("2d");
+const DM = { l: 96, r: 14, t: 12, b: 50 };
+function sx(v) { return DM.l + (v - RX[0]) / (RX[1] - RX[0]) * (DC.width - DM.l - DM.r); }
+const ylog = () => S.per !== "chg";
+function sy(v) { const f = ylog() ? (Math.log(v) - Math.log(RY[0])) / (Math.log(RY[1]) - Math.log(RY[0])) : (v - RY[0]) / (RY[1] - RY[0]); return DC.height - DM.b - f * (DC.height - DM.t - DM.b); }
+function drawDens() {
+  const Wd = DC.width, Hd = DC.height, P = R.palette[S.n];
+  dx.clearRect(0, 0, Wd, Hd);
+  const xs = [RX[0], ...BR.x, RX[1]], ys = [RY[0], ...BR.y, RY[1]];
+  for (let r = 0; r < S.n; r++) for (let s = 0; s < S.n; s++) {
+    dx.globalAlpha = S.hl && !(S.hl[0] === r && S.hl[1] === s) ? .25 : .95; dx.fillStyle = P[r][s];
+    const x0 = sx(Math.max(xs[s], RX[0])), x1 = sx(Math.min(xs[s + 1], RX[1])), y0 = sy(Math.min(ys[r + 1], RY[1])), y1 = sy(Math.max(ys[r], RY[0]));
+    dx.fillRect(x0, y0, x1 - x0, y1 - y0);
+  }
+  dx.globalAlpha = 1;
+  // 2D histogram of squares
+  const nb = 150, mb = 120, cnt = new Uint16Array(nb * mb); let mx = 0;
+  for (let k = 0; k < D.land.length; k++) { const i = D.land[k]; const a = Math.floor((sx(VX[i]) - DM.l) / (Wd - DM.l - DM.r) * nb), b = Math.floor((sy(VY[i]) - DM.t) / (Hd - DM.t - DM.b) * mb); if (a >= 0 && a < nb && b >= 0 && b < mb) { const c = ++cnt[b * nb + a]; if (c > mx) mx = c; } }
+  const cw = (Wd - DM.l - DM.r) / nb, ch = (Hd - DM.t - DM.b) / mb;
+  dx.fillStyle = isDark() ? "#000" : "#1E1B22";
+  for (let k = 0; k < cnt.length; k++) if (cnt[k]) { dx.globalAlpha = Math.min(.85, .12 + Math.sqrt(cnt[k] / mx) * .8); dx.fillRect(DM.l + (k % nb) * cw, DM.t + Math.floor(k / nb) * ch, cw + .3, ch + .3); }
+  dx.globalAlpha = 1;
+  dx.strokeStyle = css("--fg"); dx.lineWidth = 2; dx.setLineDash([6, 4]);
+  BR.x.forEach(v => { dx.beginPath(); dx.moveTo(sx(v), DM.t); dx.lineTo(sx(v), Hd - DM.b); dx.stroke(); });
+  BR.y.forEach(v => { dx.beginPath(); dx.moveTo(DM.l, sy(v)); dx.lineTo(Wd - DM.r, sy(v)); dx.stroke(); });
+  dx.setLineDash([]);
+  dx.fillStyle = css("--fg"); dx.font = `22px ${css("--mono")}`; dx.textAlign = "center";
+  const u = S.per === "chg" ? ["% change in sunshine", "% change in rain"] : ["hours of sunshine", "mm of rain (log scale)"];
+  dx.fillText(u[0], DM.l + (Wd - DM.l - DM.r) / 2, Hd - 8);
+  dx.font = `19px ${css("--mono")}`;
+  [RX[0], ...BR.x, RX[1]].forEach((v, k, a) => { if (k === 0 || k === a.length - 1) return; dx.fillText(fmtV(v), sx(v), Hd - DM.b + 22); });
+  dx.textAlign = "right"; BR.y.forEach(v => dx.fillText(fmtV(v), DM.l - 6, sy(v) + 6));
+  dx.save(); dx.translate(18, DM.t + (Hd - DM.t - DM.b) / 2); dx.rotate(-Math.PI / 2); dx.textAlign = "center"; dx.font = `22px ${css("--mono")}`; dx.fillText(u[1], 0, 0); dx.restore();
+  if (S.sel && S.sel.p >= 0 && !isNaN(VX[S.sel.p])) { const p = S.sel.p; dx.strokeStyle = css("--fg"); dx.lineWidth = 3; dx.fillStyle = css("--bg"); dx.beginPath(); dx.arc(sx(VX[p]), sy(VY[p]), 9, 0, 6.29); dx.fill(); dx.stroke(); dx.fillStyle = css("--fg"); dx.textAlign = sx(VX[p]) > Wd * .7 ? "right" : "left"; dx.font = `500 21px ${css("--mono")}`; dx.fillText(S.sel.name, sx(VX[p]) + (dx.textAlign === "right" ? -14 : 14), sy(VY[p]) - 12); }
+}
+function fmtV(v) { return S.per === "chg" ? (v >= 0 ? "+" : "") + v.toFixed(1) : fmt(v); }
+DC.addEventListener("pointermove", ev => {
+  const b = DC.getBoundingClientRect(), x = (ev.clientX - b.left) / b.width * DC.width, y = (ev.clientY - b.top) / b.height * DC.height;
+  if (x < DM.l || y > DC.height - DM.b) return;
+  const fx = RX[0] + (x - DM.l) / (DC.width - DM.l - DM.r) * (RX[1] - RX[0]);
+  const f = (DC.height - DM.b - y) / (DC.height - DM.t - DM.b); const fy = ylog() ? Math.exp(Math.log(RY[0]) + f * (Math.log(RY[1]) - Math.log(RY[0]))) : RY[0] + f * (RY[1] - RY[0]);
+  if (S.lockHl) return;
+  const h = [cls(fy, BR.y), cls(fx, BR.x)]; if (!S.hl || S.hl[0] !== h[0] || S.hl[1] !== h[1]) { S.hl = h; S.twin = null; render(); }
+});
+DC.addEventListener("pointerleave", () => { if (!S.lockHl && S.hl) { S.hl = null; render(); } });
+DC.addEventListener("click", () => { S.lockHl = !S.lockHl; if (!S.lockHl) { S.hl = null; render(); } });
+function sliders() {
+  const box = document.getElementById("sliders"); box.innerHTML = "";
+  const mk = (axis, k) => {
+    const lo = axis === "x" ? RX : RY, d = document.createElement("div"); d.className = "sl";
+    const isLog = axis === "y" && ylog(), toS = v => isLog ? Math.log(v) : v, fromS = v => isLog ? Math.exp(v) : v;
+    const inp = document.createElement("input"); inp.type = "range"; inp.min = toS(lo[0]); inp.max = toS(lo[1]); inp.step = (toS(lo[1]) - toS(lo[0])) / 400; inp.value = toS(BR[axis][k]);
+    inp.setAttribute("aria-label", (axis === "x" ? "Sunshine" : "Rainfall") + " break " + (k + 1));
+    const val = document.createElement("b"); val.textContent = fmtV(BR[axis][k]);
+    inp.oninput = () => {
+      if (S.mode !== "f") { S.mode = "f"; S.fixed = { n: S.n, key: breakKey(), x: BR.x.slice(), y: BR.y.slice() }; document.querySelectorAll("#bBtns .btn").forEach(b => b.setAttribute("aria-pressed", b.dataset.b === "f")); }
+      let v = fromS(+inp.value); const arr = S.fixed[axis];
+      if (k > 0) v = Math.max(v, arr[k - 1] + (lo[1] - lo[0]) / 200); if (k < arr.length - 1) v = Math.min(v, arr[k + 1] - (lo[1] - lo[0]) / 200);
+      arr[k] = v; val.textContent = fmtV(v); BR = { x: S.fixed.x.slice(), y: S.fixed.y.slice() }; renderLite();
+    };
+    d.innerHTML = `<span>${axis === "x" ? "Sun" : "Rain"} ${k + 1}</span>`; d.append(inp, val); box.appendChild(d);
+  };
+  BR.x.forEach((_, k) => mk("x", k)); BR.y.forEach((_, k) => mk("y", k));
+}
+let rl = 0;
+function renderLite() { cancelAnimationFrame(rl); rl = requestAnimationFrame(() => { render(); ranking(); }); }
+
+async function update() {
+  const w = document.getElementById("when");
+  w.disabled = S.per !== "now";
+  if (S.per === "now" && S.when !== "ann") await loadMonths();
+  [VX, VY] = viewArrays(); setBreaks(); renderAll();
+}
+document.querySelectorAll("#perBtns .btn").forEach(b => b.onclick = () => { S.per = b.dataset.p; document.querySelectorAll("#perBtns .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); S.hl = null; S.lockHl = false; if (S.per !== "now") { S.when = "ann"; document.getElementById("when").value = "ann"; } S.twin = null; update(); });
+document.getElementById("when").onchange = e => { S.when = e.target.value; S.twin = null; update(); };
+document.querySelectorAll("#nBtns .btn").forEach(b => b.onclick = () => { S.n = +b.dataset.n; document.querySelectorAll("#nBtns .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); S.hl = null; S.lockHl = false; update(); });
+document.querySelectorAll("#bBtns .btn").forEach(b => b.onclick = () => { S.mode = b.dataset.b; if (S.mode === "f") S.fixed = { n: S.n, key: breakKey(), x: BR.x.map(nice), y: BR.y.map(nice) }; document.querySelectorAll("#bBtns .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); update(); });
+document.querySelectorAll("#corners .card").forEach(c => c.onclick = () => {
+  const [r, s] = c.dataset.c.split(",").map(Number);
+  S.per = "now"; S.when = "ann"; S.n = 3; S.mode = "q"; document.getElementById("when").value = "ann";
+  document.querySelectorAll("#perBtns .btn").forEach(x => x.setAttribute("aria-pressed", x.dataset.p === "now"));
+  document.querySelectorAll("#nBtns .btn").forEach(x => x.setAttribute("aria-pressed", x.dataset.n === "3"));
+  document.querySelectorAll("#bBtns .btn").forEach(x => x.setAttribute("aria-pressed", x.dataset.b === "q"));
+  S.hl = [r === 2 ? 2 : 0, s === 2 ? 2 : 0]; S.lockHl = true; S.twin = null; update().then(() => document.getElementById("lmap").scrollIntoView({ behavior: "smooth", block: "center" }));
+});
+
+/* ===== your square ===== */
+let PLACES = null;
+const qi = document.getElementById("q"), sug = document.getElementById("sug"), ans = document.getElementById("answer");
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+let sugItems = [], sugIdx = -1;
+function showSug(items) { sugItems = items; sugIdx = -1; sug.innerHTML = items.map((p, k) => `<li role="option" data-k="${k}">${esc(p[0])} <span>${esc(p[1] || "")}</span></li>`).join(""); sug.style.display = items.length ? "block" : "none"; qi.setAttribute("aria-expanded", items.length > 0); }
+qi.addEventListener("input", () => {
+  const v = norm(qi.value); if (!v || !PLACES) { showSug([]); return; }
+  if (/^[a-z]{1,2}[0-9]/.test(v) && v.length >= 5) { showSug([["Look up postcode " + qi.value.toUpperCase(), "postcodes.io", 0, 0, -1]]); return; }
+  const a = [], b = [];
+  for (const p of PLACES) { const n = p._n || (p._n = norm(p[0])), m = p[5] ? (p._m || (p._m = norm(p[5]))) : ""; if (n.startsWith(v) || m.startsWith(v)) a.push(p); else if (n.includes(v)) b.push(p); if (a.length > 60) break; }
+  a.sort((x, y) => y[4] - x[4] || x[0].length - y[0].length); showSug(a.concat(b).slice(0, 12));
+});
+qi.addEventListener("keydown", e => {
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); sugIdx = Math.max(0, Math.min(sugItems.length - 1, sugIdx + (e.key === "ArrowDown" ? 1 : -1))); [...sug.children].forEach((li, k) => li.setAttribute("aria-selected", k === sugIdx)); }
+  if (e.key === "Enter") { e.preventDefault(); pick(sugItems[Math.max(0, sugIdx)]); }
+  if (e.key === "Escape") showSug([]);
+});
+sug.addEventListener("click", e => { const li = e.target.closest("li"); if (li) pick(sugItems[+li.dataset.k]); });
+function pick(p) {
+  if (!p) return; showSug([]);
+  if (p[4] === -1) return postcode(qi.value);
+  qi.value = p[0]; choose({ name: p[0], sub: p[1], e: p[2], n: p[3], how: "place" });
+}
+async function postcode(pc) {
+  ans.innerHTML = '<div class="pn">Looking up the postcode...</div>';
+  try { const r = await (await fetch("https://api.postcodes.io/postcodes/" + encodeURIComponent(pc.trim()))).json();
+    if (!r.result) throw 0; const [e, n] = wgs2bng(r.result.latitude, r.result.longitude);
+    choose({ name: r.result.postcode, sub: r.result.admin_district || "", e: e / 1000, n: n / 1000, how: "postcode" });
+  } catch (err) { ans.innerHTML = '<div class="pn">I could not find that postcode. Try a place name instead.</div>'; }
+}
+document.getElementById("geo").onclick = () => {
+  if (!navigator.geolocation) return; ans.innerHTML = '<div class="pn">Finding you...</div>';
+  navigator.geolocation.getCurrentPosition(p => { const [e, n] = wgs2bng(p.coords.latitude, p.coords.longitude); choose({ name: "Your location", e: e / 1000, n: n / 1000, how: "geo" }); }, () => { ans.innerHTML = '<div class="pn">Location not available.</div>'; });
+};
+/* WGS84 latitude and longitude to British National Grid (OSGB36), with the standard seven-parameter Helmert
+   transformation (accurate to a few metres, ample for 1 km squares) and the Ordnance Survey's transverse Mercator. */
+function wgs2bng(lat, lon) {
+  const rad = Math.PI / 180; let a = 6378137, b = 6356752.3142, e2 = 1 - b * b / (a * a);
+  let p = lat * rad, l = lon * rad, nu = a / Math.sqrt(1 - e2 * Math.sin(p) ** 2);
+  let x = nu * Math.cos(p) * Math.cos(l), y = nu * Math.cos(p) * Math.sin(l), z = (1 - e2) * nu * Math.sin(p);
+  const tx = -446.448, ty = 125.157, tz = -542.06, s = 20.4894e-6, rx = -0.1502 / 3600 * rad, ry = -0.247 / 3600 * rad, rz = -0.8421 / 3600 * rad;
+  const x2 = tx + (1 + s) * x - rz * y + ry * z, y2 = ty + rz * x + (1 + s) * y - rx * z, z2 = tz - ry * x + rx * y + (1 + s) * z;
+  a = 6377563.396; b = 6356256.909; e2 = 1 - b * b / (a * a);
+  const pp = Math.hypot(x2, y2); p = Math.atan2(z2, pp * (1 - e2));
+  for (let k = 0; k < 10; k++) { nu = a / Math.sqrt(1 - e2 * Math.sin(p) ** 2); p = Math.atan2(z2 + e2 * nu * Math.sin(p), pp); }
+  l = Math.atan2(y2, x2);
+  const F0 = 0.9996012717, p0 = 49 * rad, l0 = -2 * rad, N0 = -100000, E0 = 400000, n = (a - b) / (a + b);
+  nu = a * F0 / Math.sqrt(1 - e2 * Math.sin(p) ** 2); const rho = a * F0 * (1 - e2) / Math.pow(1 - e2 * Math.sin(p) ** 2, 1.5), eta2 = nu / rho - 1;
+  const M = b * F0 * ((1 + n + 5 / 4 * n * n + 5 / 4 * n ** 3) * (p - p0) - (3 * n + 3 * n * n + 21 / 8 * n ** 3) * Math.sin(p - p0) * Math.cos(p + p0) + (15 / 8 * n * n + 15 / 8 * n ** 3) * Math.sin(2 * (p - p0)) * Math.cos(2 * (p + p0)) - 35 / 24 * n ** 3 * Math.sin(3 * (p - p0)) * Math.cos(3 * (p + p0)));
+  const c = Math.cos(p), sn = Math.sin(p), t = Math.tan(p), dl = l - l0;
+  const I = M + N0, II = nu / 2 * sn * c, III = nu / 24 * sn * c ** 3 * (5 - t * t + 9 * eta2), IIIA = nu / 720 * sn * c ** 5 * (61 - 58 * t * t + t ** 4);
+  const IV = nu * c, V = nu / 6 * c ** 3 * (nu / rho - t * t), VI = nu / 120 * c ** 5 * (5 - 18 * t * t + t ** 4 + 14 * eta2 - 58 * t * t * eta2);
+  return [E0 + IV * dl + V * dl ** 3 + VI * dl ** 5, I + II * dl ** 2 + III * dl ** 4 + IIIA * dl ** 6];
+}
+function landNear(e, n) {
+  let p = pxOf(e, n); if (p >= 0 && !isNaN(D.sunA[p])) return p;
+  let best = -1, bd = 1e9; for (let dj = -6; dj <= 6; dj++) for (let di = -6; di <= 6; di++) { const q = pxOf(e + di, n + dj); if (q >= 0 && !isNaN(D.sunA[q]) && di * di + dj * dj < bd) { bd = di * di + dj * dj; best = q; } }
+  return best;
+}
+function rankTxt(p, cmp, sup) { return p >= .99 ? `among the ${sup} 1% of the UK` : p < .01 ? `${cmp.replace("sunnier", "duller").replace("wetter", "drier")} than 99% of the UK` : `${cmp} than ${Math.floor(p * 100)}% of the UK`; }
+function pctile(arr, v) { let c = 0, k = 0; for (let j = 0; j < D.land.length; j += 2) { k++; if (arr[D.land[j]] < v) c++; } return c / k; }
+async function choose(pl, fly = true) {
+  await baseP; const p = landNear(pl.e, pl.n);
+  if (p < 0) { ans.innerHTML = `<div class="pn">${esc(pl.name)} is outside the grid (HadUK-Grid covers the UK's land only).</div>`; return; }
+  S.sel = { p, name: pl.name }; drawDens();
+  if (lmap) { if (pin) pin.remove(); const [e, n] = enOf(p); pin = L.marker(ll(e, n), { icon: L.divIcon({ className: "", html: '<div class="pin"></div>', iconSize: [18, 18], iconAnchor: [9, 9] }), interactive: false }).addTo(lmap); if (fly) lmap.setView(ll(e, n), Math.max(lmap.getZoom(), 1.5)); }
+  ans.innerHTML = '<div class="pn">Loading the monthly grids...</div>';
+  await loadMonths();
+  const sA = D.sunA[p], rA = D.rainA[p], s6 = D.sun6[p], r6 = D.rain6[p];
+  const sm = MON.map((_, m) => D.sunM[m][p]), rm = MON.map((_, m) => D.rainM[m][p]), tm = MON.map((_, m) => D.tmaxM[m][p]);
+  const ps = pctile(D.sunA, sA), pr = pctile(D.rainA, rA);
+  const b3 = { x: R.breaks.sun3, y: R.breaks.rain3 }, r3 = cls(rA, b3.y), s3 = cls(sA, b3.x);
+  const word = ["dull and dry", "", "sunny and dry", "", "", "", "dull and wet", "", "sunny and wet"][r3 * 3 + s3] || ((s3 === 1 ? "middling sun" : s3 === 0 ? "dull" : "sunny") + ", " + (r3 === 1 ? "middling rain" : r3 === 0 ? "dry" : "wet"));
+  const best = sm.indexOf(Math.max(...sm)), wet = rm.indexOf(Math.max(...rm));
+  const [e, n] = enOf(p);
+  const reg = REG[D.reg[p] - 1];
+  ans.innerHTML = `<div class="big">${esc(pl.name)}: <em style="color:${R.palette[3][r3][s3]};${r3 === 0 && s3 === 0 ? "background:var(--fg);padding:0 4px" : ""}">${word}</em></div>
+  <div class="pn">${pl.sub ? esc(pl.sub) + " · " : ""}${reg} · 1 km square at grid reference ${Math.floor(e)} km E, ${Math.floor(n)} km N${pxOf(pl.e, pl.n) === p ? "" : " (nearest land square)"}</div>
+  <div class="kv"><div><b style="color:var(--sun)">${fmt(sA)}</b>hours of sun a year, ${rankTxt(ps, "sunnier", "sunniest")}</div><div><b style="color:var(--rain)">${fmt(rA)}</b>mm of rain a year, ${rankTxt(pr, "wetter", "wettest")}</div>
+  <div><b>${(sA / s6 - 1) >= 0 ? "+" : ""}${((sA / s6 - 1) * 100).toFixed(1)}%</b>sunshine since 1961 to 1990 (${fmt(s6)} h then)</div><div><b>${(rA / r6 - 1) >= 0 ? "+" : ""}${((rA / r6 - 1) * 100).toFixed(1)}%</b>rainfall since 1961 to 1990 (${fmt(r6)} mm then)</div></div>
+  <div class="chart" id="sqChart"></div>
+  <div class="pn">Sunniest month ${MON[best]} (${fmt(sm[best])} h); wettest ${MON[wet]} (${fmt(rm[wet])} mm); warmest average high ${Math.max(...tm).toFixed(1)} °C in ${MON[tm.indexOf(Math.max(...tm))]}.</div>
+  <div class="controls" style="margin-top:8px"><button class="btn" id="twinBtn">Where else has weather like this?</button><div class="sl" style="flex:1 1 220px;margin:0"><span>Within</span><input type="range" id="twinTol" min="2" max="20" step="1" value="5" aria-label="Tolerance in percent"><b id="twinTolV">±5%</b></div></div>
+  <div class="pn" id="twinNote"></div>`;
+  sqChart(sm, rm, tm);
+  const tol = document.getElementById("twinTol");
+  tol.oninput = () => { document.getElementById("twinTolV").textContent = "±" + tol.value + "%"; if (S.twin) { S.twin.tol = tol.value / 100; render(); } };
+  document.getElementById("twinBtn").onclick = () => {
+    S.per = "now"; S.when = "ann"; document.getElementById("when").value = "ann"; document.querySelectorAll("#perBtns .btn").forEach(x => x.setAttribute("aria-pressed", x.dataset.p === "now"));
+    S.hl = null; S.lockHl = false; S.twin = { s: sA, r: rA, tol: tol.value / 100, name: pl.name }; update().then(() => { document.getElementById("lmap").scrollIntoView({ behavior: "smooth", block: "center" }); if (lmap) lmap.fitBounds([ll(GM.x0_km, GM.y_top_km - H), ll(GM.x0_km + W, GM.y_top_km)], { padding: [4, 4] }); });
+  };
+}
+function twinNote() {
+  const t = document.getElementById("twinNote"); if (!t || !S.twin) return;
+  // towns whose annual sun and rain are within the tolerance
+  const near = TOWNS ? TOWNS.filter(r => r[2] === 1 && Math.abs(r[7] / S.twin.s - 1) <= S.twin.tol && Math.abs(r[8] / S.twin.r - 1) <= S.twin.tol).sort((a, b) => b[3] - a[3]).slice(0, 8).map(r => r[0]) : [];
+  t.innerHTML = `${fmt(S.twin.km2)} km² (${(S.twin.km2 / R.meta.cells * 100).toFixed(1)}% of the UK) has annual sunshine and rainfall within ±${Math.round(S.twin.tol * 100)}% of ${esc(S.twin.name)}, lit up on the map.${near.length ? " Bigger towns among them: " + near.map(esc).join(", ") + "." : ""} <a href="#" id="twinOff">Clear</a>`;
+  document.getElementById("twinOff").onclick = e => { e.preventDefault(); S.twin = null; render(); t.innerHTML = ""; };
+}
+function sqChart(sm, rm, tm) {
+  resp(document.getElementById("sqChart"), (w, sm_) => {
+    const h = 230, m = { l: 40, r: 40, t: 14, b: 26 }, svg = el("svg", { viewBox: `0 0 ${w} ${h}` }, document.getElementById("sqChart"));
+    const iw = w - m.l - m.r, ih = h - m.t - m.b, bw = iw / 12, ms = Math.ceil(Math.max(...sm) / 40) * 40, mr = Math.ceil(Math.max(...rm) / 20) * 20;
+    for (let k = 0; k <= 4; k++) { const y = m.t + ih - ih * k / 4; el("line", { x1: m.l, x2: w - m.r, y1: y, y2: y, stroke: css("--rule") }, svg); lbl(svg, m.l - 6, y + 4, Math.round(ms * k / 4), "lab s m", "end"); lbl(svg, w - m.r + 6, y + 4, Math.round(mr * k / 4), "lab s m"); }
+    sm.forEach((v, k) => { const x = m.l + k * bw; const r1 = el("rect", { x: x + bw * .1, width: bw * .38, y: m.t + ih - v / ms * ih, height: v / ms * ih, fill: css("--sun") }, svg); hover(r1, `<b>${MON[k]}</b><br>${fmt(v)} hours of sun`);
+      const r2 = el("rect", { x: x + bw * .5, width: bw * .38, y: m.t + ih - rm[k] / mr * ih, height: rm[k] / mr * ih, fill: css("--rain") }, svg); hover(r2, `<b>${MON[k]}</b><br>${fmt(rm[k])} mm of rain<br>average high ${tm[k].toFixed(1)} °C`);
+      lbl(svg, x + bw / 2, h - 8, sm_ ? MON[k][0] : MON[k].slice(0, 3), "lab s m", "middle"); });
+    lbl(svg, m.l - 6, m.t - 3, "hours", "lab s", "end"); lbl(svg, w - m.r + 6, m.t - 3, "mm", "lab s");
+  });
+}
+
+/* ===== charts ===== */
+function coastChart() {
+  resp(document.getElementById("coastChart"), (w, sm) => {
+    const C = R.coast, bands = C.bands, h = 260, m = { l: 48, r: sm ? 70 : 90, t: 14, b: 40 };
+    const svg = el("svg", { viewBox: `0 0 ${w} ${h}` }, document.getElementById("coastChart")), iw = w - m.l - m.r, ih = h - m.t - m.b;
+    const labs = bands.map(b => b.to_km > 100 ? "80+" : sm ? "" + b.to_km : b.from_km + " to " + b.to_km);
+    const y = v => m.t + ih - (v - 1100) / (1750 - 1100) * ih, x = k => m.l + (k + .5) * iw / bands.length;
+    [1200, 1400, 1600].forEach(v => { el("line", { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: css("--rule") }, svg); lbl(svg, m.l - 6, y(v) + 4, fmt(v), "lab s m", "end"); });
+    labs.forEach((t, k) => lbl(svg, x(k), h - 22, t, "lab s m", "middle")); lbl(svg, m.l + iw / 2, h - 4, sm ? "km from the sea (up to)" : "km from the sea", "lab s m", "middle");
+    const col = { England: css("--sun"), Wales: css("--plum"), Scotland: css("--rain") };
+    for (const nn of ["England", "Wales", "Scotland"]) { const v = C.bands_nation[nn]; let d = ""; v.forEach((q, k) => { if (q != null) d += (d ? "L" : "M") + x(k) + " " + y(q); });
+      el("path", { d, fill: "none", stroke: col[nn], "stroke-width": 3 }, svg);
+      v.forEach((q, k) => { if (q == null) return; const c = el("circle", { cx: x(k), cy: y(q), r: 5, fill: col[nn] }, svg); hover(c, `<b>${nn}</b>, ${labs[k]} km from the sea<br>${fmt(q)} hours of sun a year`); });
+      const last = v.filter(q => q != null).length - 1; lbl(svg, x(last) + 10, y(v[last]) + 4, nn, "lab b"); }
+  });
+}
+function chgChart() {
+  resp(document.getElementById("chgChart"), (w, sm) => {
+    const rows = R.regions, rh = 30, m = { l: sm ? 150 : 200, r: 50, t: 20, b: 26 }, h = m.t + m.b + rows.length * rh + 14;
+    const svg = el("svg", { viewBox: `0 0 ${w} ${h}` }, document.getElementById("chgChart")), iw = w - m.l - m.r, mx = 12;
+    const x = v => m.l + v / mx * iw;
+    [0, 4, 8, 12].forEach(v => { el("line", { x1: x(v), x2: x(v), y1: m.t - 6, y2: h - m.b, stroke: css("--rule") }, svg); lbl(svg, x(v), h - 8, "+" + v + "%", "lab s m", "middle"); });
+    let yy = m.t;
+    rows.forEach((r, k) => { if (k === 4) yy += 14; const isN = r.level === "nation";
+      lbl(svg, m.l - 8, yy + 17, (sm && r.name === "Yorkshire and the Humber") ? "Yorkshire and Humber" : r.name, "lab" + (isN ? " b" : ""), "end");
+      const a = el("rect", { x: x(0), y: yy + 4, width: x(r.sun_chg_pct) - x(0), height: 10, fill: css("--sun") }, svg);
+      const b = el("rect", { x: x(0), y: yy + 15, width: x(r.rain_chg_pct) - x(0), height: 10, fill: css("--rain") }, svg);
+      hover(a, `<b>${r.name}</b><br>sunshine ${fmt(r.sun6190)} to ${fmt(r.sun)} hours (+${r.sun_chg_pct.toFixed(1)}%)`); hover(b, `<b>${r.name}</b><br>rainfall ${fmt(r.rain6190)} to ${fmt(r.rain)} mm (+${r.rain_chg_pct.toFixed(1)}%)`);
+      lbl(svg, x(Math.max(r.sun_chg_pct, r.rain_chg_pct)) + 5, yy + 19, "+" + r.sun_chg_pct.toFixed(1) + "%", "lab s m"); yy += rh; });
+  });
+}
+let monMode = "sun";
+function monChart() {
+  resp(document.getElementById("monChart"), (w, sm) => {
+    const h = 260, m = { l: 44, r: sm ? 92 : 120, t: 14, b: 28 }, svg = el("svg", { viewBox: `0 0 ${w} ${h}` }, document.getElementById("monChart"));
+    const iw = w - m.l - m.r, ih = h - m.t - m.b, mx = monMode === "sun" ? 240 : 200, x = k => m.l + k * iw / 11, y = v => m.t + ih - v / mx * ih;
+    for (let k = 0; k <= 4; k++) { const v = mx * k / 4; el("line", { x1: m.l, x2: w - m.r, y1: y(v), y2: y(v), stroke: css("--rule") }, svg); lbl(svg, m.l - 6, y(v) + 4, fmt(v), "lab s m", "end"); }
+    MON.forEach((t, k) => lbl(svg, x(k), h - 8, sm ? t[0] : t.slice(0, 3), "lab s m", "middle"));
+    const col = { England: css("--sun"), Wales: css("--plum"), Scotland: css("--rain"), "Northern Ireland": css("--muted") };
+    const ends = [];
+    for (const nn of Object.keys(col)) { const v = R.months.map(q => q[monMode + "_" + nn]); el("path", { d: v.map((q, k) => (k ? "L" : "M") + x(k) + " " + y(q)).join(""), fill: "none", stroke: col[nn], "stroke-width": 3 }, svg);
+      v.forEach((q, k) => { const c = el("circle", { cx: x(k), cy: y(q), r: 4, fill: col[nn] }, svg); hover(c, `<b>${nn}, ${MON[k]}</b><br>${fmt(q)} ${monMode === "sun" ? "hours of sun" : "mm of rain"}`); });
+      ends.push([y(v[11]), nn]); }
+    ends.sort((a, b) => a[0] - b[0]); for (let k = 1; k < ends.length; k++) if (ends[k][0] - ends[k - 1][0] < 14) ends[k][0] = ends[k - 1][0] + 14;
+    ends.forEach(([yy, nn]) => lbl(svg, w - m.r + 8, yy + 4, sm && nn === "Northern Ireland" ? "N. Ireland" : nn, "lab s b"));
+  });
+}
+document.querySelectorAll("#monBtns .btn").forEach(b => b.onclick = () => { monMode = b.dataset.m; document.querySelectorAll("#monBtns .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); document.getElementById("monH").textContent = monMode === "sun" ? "Monthly sunshine by nation" : "Monthly rainfall by nation"; monChart(); });
+
+/* ===== warm months ===== */
+const pc = document.getElementById("pcan"); pc.width = W; pc.height = H; const px2 = pc.getContext("2d"); const pimg = px2.createImageData(W, H);
+const PSEQ = ["#D3DAD8", "#F7DDB0", "#F4C27F", "#EE9F55", "#DE7A3B", "#C55536", "#9E3A3E", "#742B45", "#4F2147", "#3E1C47", "#2E1535", "#21102A", "#160A1E"];
+let pTimer = 0;
+function pleasant() {
+  if (!D.tmaxM.length) return;
+  const lo = +document.getElementById("plo").value, hi = +document.getElementById("phi").value;
+  document.getElementById("ploV").textContent = lo + " °C"; document.getElementById("phiV").textContent = hi + " °C";
+  const d = pimg.data, hist = new Array(13).fill(0); d.fill(0);
+  const cols = PSEQ.map(hex);
+  for (const i of D.land) { let n = 0; for (let m = 0; m < 12; m++) { const t = D.tmaxM[m][i]; if (t >= lo && t <= hi) n++; } hist[n]++; const c = cols[n]; d[i * 4] = c[0]; d[i * 4 + 1] = c[1]; d[i * 4 + 2] = c[2]; d[i * 4 + 3] = 255; }
+  px2.putImageData(pimg, 0, 0);
+  const tot = D.land.length, mxn = hist.reduce((a, v, k) => v ? k : a, 0);
+  document.getElementById("pH").textContent = lo > hi ? "Set the lowest below the highest" : `Months with a mean daily high of ${lo} to ${hi} °C`;
+  const box = document.getElementById("pHist"); box.innerHTML = "";
+  const w = Math.max(260, box.clientWidth), h = 230, m = { l: 34, r: 10, t: 24, b: 36 }, svg = el("svg", { viewBox: `0 0 ${w} ${h}` }, box);
+  const n = Math.max(6, mxn + 1), bw = (w - m.l - m.r) / n, mv = Math.max(...hist) / tot;
+  for (let k = 0; k < n; k++) { const f = hist[k] / tot, bh = f / mv * (h - m.t - m.b); const r = el("rect", { x: m.l + k * bw + 2, y: h - m.b - bh, width: bw - 4, height: bh, fill: PSEQ[k], stroke: css("--border") }, svg);
+    hover(r, `<b>${k} month${k === 1 ? "" : "s"}</b><br>${(f * 100).toFixed(1)}% of the UK's land`); lbl(svg, m.l + k * bw + bw / 2, h - m.b + 16, k, "lab s m", "middle"); if (f > .005) lbl(svg, m.l + k * bw + bw / 2, h - m.b - bh - 4, Math.round(f * 100) + "%", "lab s", "middle"); }
+  lbl(svg, m.l + (w - m.l - m.r) / 2, h - 4, "months in the band (share of land)", "lab s m", "middle");
+}
+["plo", "phi"].forEach(id => document.getElementById(id).addEventListener("input", () => { cancelAnimationFrame(pTimer); pTimer = requestAnimationFrame(pleasant); }));
+new IntersectionObserver((en, ob) => { if (en.some(e => e.isIntersecting)) { ob.disconnect(); baseP.then(loadMonths).then(pleasant); } }, { rootMargin: "300px" }).observe(pc);
+
+/* ===== rankings ===== */
+let TOWNS = null, RK = "sunny", RS = 1;
+function townVal(r) {
+  const off = 11; if (RK === "gain") return r[7] / r[9] - 1;
+  if (S.per !== "now" || S.when === "ann") return RK === "sunny" || RK === "dull" ? r[7] : r[8];
+  const ms = S.when.startsWith("m:") ? [+S.when.slice(2)] : SEAS[S.when.slice(2)];
+  return ms.reduce((a, m) => a + (RK === "sunny" || RK === "dull" ? r[off + m] : r[off + 12 + m]), 0);
+}
+function ranking() {
+  if (!TOWNS) return;
+  const t = document.getElementById("rkt"), rows = TOWNS.filter(r => r[2] === RS);
+  const asc = RK === "dull" || RK === "dry";
+  const sorted = rows.map(r => [r, townVal(r)]).sort((a, b) => asc ? a[1] - b[1] : b[1] - a[1]).slice(0, 15);
+  const per = (S.per !== "now" || S.when === "ann" || RK === "gain") ? "the whole year" : document.getElementById("when").selectedOptions[0].textContent.toLowerCase();
+  document.getElementById("rkSub").textContent = `${RS ? "UK towns and cities of 15,000 or more (GeoNames)" : "All cities and towns in OS Open Names (Great Britain)"}, ${RK === "gain" ? "change in annual sunshine from 1961 to 1990 to 1991 to 2020" : per + ", 1991 to 2020"}. Tap a row to see it on the map.`;
+  t.innerHTML = `<tr><th>#</th><th>Town</th><th class="wide">${RS ? "Population" : "County"}</th><th class="num">${RK === "gain" ? "Change" : RK === "sunny" || RK === "dull" ? "Sun (h)" : "Rain (mm)"}</th><th class="num wide">${RK === "gain" ? "Sun then and now" : RK === "sunny" || RK === "dull" ? "Rain (mm)" : "Sun (h)"}</th></tr>` +
+    sorted.map(([r, v], k) => `<tr class="go" data-k="${TOWNS.indexOf(r)}"><td>${k + 1}</td><td>${esc(r[0])}<small>${REG[r[6]]}</small></td><td class="wide">${RS ? fmt(r[3]) : esc(r[1])}</td><td class="num">${RK === "gain" ? (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%" : fmt(v)}</td><td class="num wide">${RK === "gain" ? fmt(r[9]) + " to " + fmt(r[7]) : RK === "sunny" || RK === "dull" ? fmt(townValAlt(r)) : fmt(townValAlt(r))}</td></tr>`).join("");
+  t.querySelectorAll("tr.go").forEach(tr => tr.onclick = () => { const r = TOWNS[+tr.dataset.k]; choose({ name: r[0], sub: r[1] || "", e: r[4], n: r[5], how: "place" }); document.querySelector(".finder").scrollIntoView({ behavior: "smooth", block: "start" }); });
+}
+function townValAlt(r) { const k = RK; RK = (k === "sunny" || k === "dull") ? "wet" : "sunny"; const v = townVal(r); RK = k; return v; }
+document.querySelectorAll("#rkBtns .btn").forEach(b => b.onclick = () => { RK = b.dataset.k; document.querySelectorAll("#rkBtns .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); ranking(); });
+document.querySelectorAll("#rsBtns .btn").forEach(b => b.onclick = () => { RS = +b.dataset.s; document.querySelectorAll("#rsBtns .btn").forEach(x => x.setAttribute("aria-pressed", x === b)); ranking(); });
+
+/* ===== start ===== */
+coastChart(); chgChart(); monChart();
+initMap();
+const baseP = loadBase().then(() => { [VX, VY] = viewArrays(); setBreaks(); renderAll(); }).catch(e => { msg.textContent = "The grids did not load."; console.error(e); });
+fetch("data/places_search.json").then(r => r.json()).then(p => { PLACES = p; });
+fetch("data/towns_page.json").then(r => r.json()).then(t => { TOWNS = t.rows; ranking(); });
+redraws.push(() => { if (D.land) renderAll(); pleasant(); });
+</script>
+</body>
+</html>
