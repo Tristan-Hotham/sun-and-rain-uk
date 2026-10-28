@@ -916,6 +916,6 @@ fetch("data/places_search.json").then(r => r.json()).then(p => { PLACES = p; pla
 fetch("data/towns_page.json").then(r => r.json()).then(t => { TOWNS = t.rows; ranking(); });
 redraws.push(() => { if (D.land) { renderAll(); buildLines(); } pleasant(); });
 </script>
-<script src="https://tristan-hotham.github.io/assets/site-nav.js" defer></script>
+<script src="/assets/site-nav.js" defer></script>
 </body>
 </html>
