@@ -1,0 +1,33 @@
+{
+ "x0_km": -2,
+ "y_top_km": 1220,
+ "width": 660,
+ "height": 1214,
+ "note": "pixel (i, j): easting = x0_km + i + 0.5 km, northing = y_top_km - j - 0.5 km",
+ "decode": {
+  "sun_m": "(v-1)*1.2",
+  "rain_m": "exp(ln15+(v-1)/254*(ln800-ln15))",
+  "tmax": "(v-1)/8-5",
+  "sun_a": "600+(v-1)*6",
+  "rain_a": "exp(ln400+(v-1)/254*(ln6000-ln400))",
+  "change": "(v-127)/4"
+ },
+ "files": [
+  "ann9120.png",
+  "ann6190.png",
+  "change.png",
+  "regions.png",
+  "m01.png",
+  "m02.png",
+  "m03.png",
+  "m04.png",
+  "m05.png",
+  "m06.png",
+  "m07.png",
+  "m08.png",
+  "m09.png",
+  "m10.png",
+  "m11.png",
+  "m12.png"
+ ]
+}
