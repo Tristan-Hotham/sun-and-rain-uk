@@ -97,7 +97,18 @@ input[type=search]{font:400 15px/1 var(--mono);background:var(--card);color:var(
 .leaflet-control-attribution a{color:var(--fg)}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--fg);border-radius:3px}
 .city{font:500 11px/1 var(--mono);color:var(--fg);white-space:nowrap;text-shadow:0 0 3px var(--bg),0 0 3px var(--bg),0 0 2px var(--bg);pointer-events:none}
-.zlo .city.t2{display:none}
+.city.r1{font-size:10px;font-weight:400}.city.r0{font-size:9.5px;font-weight:400;opacity:.85}.city.r0 i,.city.r1 i{width:4px;height:4px}
+.lyrBtn{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;font:600 12px/1 var(--mono);padding:8px 10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.lyrBtn[aria-expanded="true"]{background:var(--fg);color:var(--bg)}
+.lyrPanel{background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:3px;padding:10px 12px 8px;margin-top:6px;width:236px;box-shadow:0 2px 10px rgba(0,0,0,.15);font:400 12px/1.3 var(--mono)}
+.lyrPanel[hidden]{display:none}
+.lyrPanel .row{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center;margin:0 0 9px}
+.lyrPanel label{display:flex;gap:6px;align-items:center;cursor:pointer;font-weight:600}
+.lyrPanel input[type=range]{width:100%;accent-color:var(--fg)}
+.lyrPanel select{font:400 12px var(--mono);background:var(--bg);color:var(--fg);border:1px solid var(--border);border-radius:2px;padding:2px 4px;width:100%}
+.lyrPanel .sub{grid-column:1/-1;display:flex;gap:6px;align-items:center;color:var(--muted);font-size:11px}
+.lyrPanel .sub span{flex:0 0 52px}
+.lyrPanel .reset{font:400 11px var(--mono);color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 .city i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--fg);margin-right:4px;vertical-align:1px}
 .pin{width:18px;height:18px;border:3px solid var(--fg);border-radius:50%;background:transparent;box-shadow:0 0 0 2px var(--bg)}
 .side{background:var(--card);border:1px solid var(--border);padding:14px 14px 10px}
@@ -414,8 +425,29 @@ function className(r, s) {
 }
 
 /* ===== map ===== */
-const cv = document.createElement("canvas"); cv.width = W; cv.height = H; const cx = cv.getContext("2d");
-const img = cx.createImageData(W, H);
+const img = new ImageData(W, H);                       // 1 km colours
+const cv = document.createElement("canvas"); cv.width = 2 * W; cv.height = 2 * H; const cx = cv.getContext("2d");
+const img2 = cx.createImageData(2 * W, 2 * H);           // 500 m, with hill shading
+let HILL = null;                                          // 500 m shade, 0 dark to 1 flat
+function loadHills() {
+  if (HILL) return Promise.resolve();
+  return fetch("data/grid/hill.png").then(r => r.blob()).then(bl => createImageBitmap(bl, { colorSpaceConversion: "none", premultiplyAlpha: "none" })).then(bm => {
+    const c = document.createElement("canvas"); c.width = 2 * W; c.height = 2 * H; const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(bm, 0, 0);
+    const d = x.getImageData(0, 0, 2 * W, 2 * H).data; HILL = new Float32Array(4 * W * H); for (let i = 0; i < HILL.length; i++) HILL[i] = d[i * 4] / 255;
+  });
+}
+function compose() {
+  const s = img.data, d = img2.data, W2 = 2 * W, k = (typeof LY !== "undefined" && LY.hills && HILL) ? Math.min(1, .15 + LY.hillK / 100) : 0, dark = isDark();
+  for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+    const p = (j * W + i) * 4; if (!s[p + 3]) { for (const q of [(2 * j * W2 + 2 * i) * 4, (2 * j * W2 + 2 * i + 1) * 4, ((2 * j + 1) * W2 + 2 * i) * 4, ((2 * j + 1) * W2 + 2 * i + 1) * 4]) d[q + 3] = 0; continue; }
+    for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) {
+      const h = (2 * j + dy) * W2 + 2 * i + dx, q = h * 4;
+      let f = 1; if (k) { const v = HILL[h]; f = dark ? 1 + k * (v - .78) * .9 : 1 - k * (1 - v) * .85; }
+      d[q] = Math.min(255, s[p] * f); d[q + 1] = Math.min(255, s[p + 1] * f); d[q + 2] = Math.min(255, s[p + 2] * f); d[q + 3] = 255;
+    }
+  }
+  cx.putImageData(img2, 0, 0);
+}
 let CL = null;  // class index per pixel
 function render() {
   if (!D.land) return;
@@ -436,7 +468,7 @@ function render() {
   if (S.hl && !twin) { const c = P[S.hl[0]][S.hl[1]]; if (.2126 * c[0] + .7152 * c[1] + .0722 * c[2] > 200) {
     const on = i => CL[i] === S.hl[0] * 10 + S.hl[1], ink = isDark() ? [255, 255, 255] : [30, 27, 34];
     for (const i of D.land) if (on(i) && (!on(i - 1) || !on(i + 1) || !on(i - W) || !on(i + W))) { d[i * 4] = ink[0]; d[i * 4 + 1] = ink[1]; d[i * 4 + 2] = ink[2]; } } }
-  cx.putImageData(img, 0, 0);
+  compose();
   if (S.twin) { S.twin.km2 = nOn; twinNote(); }
   drawDens(); legendHL();
 }
@@ -461,6 +493,87 @@ function readSquare(p) {
   const v = S.per === "chg" ? [(VX[p] >= 0 ? "+" : "") + VX[p].toFixed(1), (VY[p] >= 0 ? "+" : "") + VY[p].toFixed(1)] : [fmt(VX[p]), fmt(VY[p])];
   return `<b>${esc(nearestName(e, n) || "Square")}</b> · ${REG[D.reg[p] - 1] || ""}<br><span class="sw" style="background:${P[r][s]}"></span>${className(r, s)}<br>${v[0]} ${units[0]} · ${v[1]} ${units[1]}${S.per !== "chg" && S.when !== "ann" && S.per === "now" ? " (" + document.getElementById("when").selectedOptions[0].textContent.toLowerCase() + ")" : ""}`;
 }
+/* ===== map layers: hills, place names, borders, colour strength ===== */
+const LY = { colour: 100, hills: true, hillK: 55, names: true, nameLvl: 1, lines: true, lineK: 50 };
+const LYDEF = { ...LY };
+try { Object.assign(LY, JSON.parse(localStorage.getItem("sr_uk_layers") || "{}")); } catch (e) {}
+const saveLY = () => { try { localStorage.setItem("sr_uk_layers", JSON.stringify(LY)); } catch (e) {} };
+let lineL = null, nameL = null;
+const lineCv = document.createElement("canvas");
+function initLayers(b) {
+  lineL = new CanvasOverlay(lineCv, b, { interactive: false });
+  nameL = L.layerGroup();
+  const Ctl = L.Control.extend({ options: { position: "topright" }, onAdd() {
+    const d = L.DomUtil.create("div"); L.DomEvent.disableClickPropagation(d); L.DomEvent.disableScrollPropagation(d);
+    d.innerHTML = `<button class="lyrBtn" aria-expanded="false" aria-controls="lyrPanel">Map layers</button>
+<div class="lyrPanel" id="lyrPanel" hidden>
+ <div class="row"><label><input type="checkbox" id="lyHills"> Hills</label><span></span><div class="sub"><span>strength</span><input type="range" id="lyHillK" min="10" max="100" step="5" aria-label="Hill shading strength"></div></div>
+ <div class="row"><label><input type="checkbox" id="lyNames"> Place names</label><span></span><div class="sub"><span>how many</span><select id="lyNameLvl" aria-label="How many place names"><option value="0">Cities only</option><option value="1">Cities and towns</option><option value="2">Down to villages</option></select></div></div>
+ <div class="row"><label><input type="checkbox" id="lyLines"> Coast and borders</label><span></span><div class="sub"><span>strength</span><input type="range" id="lyLineK" min="10" max="100" step="5" aria-label="Coast and border line strength"></div></div>
+ <div class="row"><label style="font-weight:600">Colour</label><span></span><div class="sub"><span>strength</span><input type="range" id="lyColour" min="25" max="100" step="5" aria-label="Colour strength"></div></div>
+ <button class="reset" id="lyReset">Reset layers</button>
+</div>`;
+    return d; } });
+  lmap.addControl(new Ctl());
+  const q = id => document.getElementById(id), btn = lmap.getContainer().querySelector(".lyrBtn"), pan = q("lyrPanel");
+  btn.onclick = () => { const o = pan.hidden; pan.hidden = !o; btn.setAttribute("aria-expanded", o); };
+  const sync = () => { q("lyHills").checked = LY.hills; q("lyHillK").value = LY.hillK; q("lyNames").checked = LY.names; q("lyNameLvl").value = LY.nameLvl; q("lyLines").checked = LY.lines; q("lyLineK").value = LY.lineK; q("lyColour").value = LY.colour; };
+  const on = (id, ev, f) => q(id).addEventListener(ev, e => { f(e.target); saveLY(); applyLayers(); });
+  on("lyHills", "change", t => LY.hills = t.checked); on("lyHillK", "input", t => { LY.hillK = +t.value; LY.hills = true; q("lyHills").checked = true; });
+  on("lyNames", "change", t => LY.names = t.checked); on("lyNameLvl", "change", t => { LY.nameLvl = +t.value; LY.names = true; q("lyNames").checked = true; });
+  on("lyLines", "change", t => LY.lines = t.checked); on("lyLineK", "input", t => { LY.lineK = +t.value; LY.lines = true; q("lyLines").checked = true; });
+  on("lyColour", "input", t => LY.colour = +t.value);
+  q("lyReset").onclick = () => { Object.assign(LY, LYDEF); saveLY(); sync(); applyLayers(); };
+  sync();
+  lmap.on("zoomend moveend", placeNames);
+  applyLayers();
+}
+function applyLayers() {
+  if (!lmap) return;
+  overlay.setOpacity(LY.colour / 100);
+  if (LY.hills && !HILL) loadHills().then(() => { if (D.land) compose(); }); else if (D.land) compose();
+  if (LY.lines && lineCv.width) { lineL.addTo(lmap); lineL.bringToFront(); lineL.setOpacity(.15 + LY.lineK / 100 * .85); } else lineL.remove();
+  if (LY.names) nameL.addTo(lmap); else nameL.remove();
+  placeNames();
+}
+/* coast and region borders, drawn once on a 4x canvas along the edges of the 1 km squares */
+function buildLines() {
+  const k = 4; lineCv.width = W * k; lineCv.height = H * k;
+  const g = lineCv.getContext("2d"), ink = isDark() ? "#f2eee6" : "#1e1b22";
+  const isL = i => !isNaN(D.sunA[i]);
+  g.strokeStyle = ink; g.lineCap = "square";
+  const pass = (test, w, dash) => { g.lineWidth = w; g.setLineDash(dash); g.beginPath();
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) { const p = j * W + i;
+      if (i < W - 1 && test(p, p + 1)) { g.moveTo((i + 1) * k, j * k); g.lineTo((i + 1) * k, (j + 1) * k); }
+      if (j < H - 1 && test(p, p + W)) { g.moveTo(i * k, (j + 1) * k); g.lineTo((i + 1) * k, (j + 1) * k); } }
+    g.stroke(); };
+  g.clearRect(0, 0, lineCv.width, lineCv.height);
+  pass((a, c) => isL(a) !== isL(c), 2.4, []);                                         // coast
+  pass((a, c) => isL(a) && isL(c) && D.reg[a] !== D.reg[c] && D.reg[a] && D.reg[c], 1.8, [5, 4]); // regions and nations
+  applyLayers();
+}
+const MAJOR = new Set(["London", "Birmingham", "Manchester", "Glasgow", "Edinburgh", "Cardiff", "Belfast"]);
+function placeNames() {
+  if (!lmap || !nameL) return;
+  nameL.clearLayers(); if (!LY.names) return;
+  const z = lmap.getZoom(), bb = lmap.getBounds().pad(.05), lvl = LY.nameLvl;
+  const cand = CITIES.map(([nm, e, n]) => ({ nm, e, n, r: MAJOR.has(nm) ? 4 : 3 }));
+  const seen = new Set(cand.map(c => c.nm));
+  if (PLACES) {
+    const minR = lvl === 0 ? (z >= 0.5 ? 2 : 9) : lvl === 1 ? (z >= 1.25 ? 1 : z >= -0.75 ? 2 : 9) : (z >= 2.5 ? 0 : z >= 0.25 ? 1 : z >= -1 ? 2 : 9);
+    for (const p of PLACES) if (p[4] >= minR && !seen.has(p[0])) cand.push({ nm: p[0], e: p[2], n: p[3], r: p[4] });
+  }
+  if (lvl === 0 && z < 0.5) for (const c of cand) if (c.r === 3 && z < -0.3) c.skip = true;
+  const vis = cand.filter(c => !c.skip && bb.contains(ll(c.e, c.n))).sort((a, b) => b.r - a.r);
+  const boxes = [], out = [];
+  for (const c of vis) {
+    const pt = lmap.latLngToContainerPoint(ll(c.e, c.n)), fs = c.r >= 3 ? 11 : c.r === 2 ? 11 : 10;
+    const bx = [pt.x - 4, pt.y - 8, pt.x + 10 + c.nm.length * fs * .62, pt.y + 7];
+    if (boxes.some(o => bx[0] < o[2] && bx[2] > o[0] && bx[1] < o[3] && bx[3] > o[1])) continue;
+    boxes.push(bx); out.push(c); if (out.length >= 320) break;
+  }
+  for (const c of out) L.marker(ll(c.e, c.n), { interactive: false, keyboard: false, icon: L.divIcon({ className: "city" + (c.r <= 1 ? " r" + c.r : ""), html: `<i></i>${esc(c.nm)}`, iconSize: null, iconAnchor: [3, 6] }) }).addTo(nameL);
+}
 function initMap() {
   if (!window.L) { document.getElementById("lmap").innerHTML = '<p style="padding:16px">The map library did not load.</p>'; return; }
   const b = [ll(GM.x0_km, GM.y_top_km - H), ll(GM.x0_km + W, GM.y_top_km)];
@@ -472,9 +585,7 @@ function initMap() {
     L.geoJSON({ type: "GeometryCollection", geometries: gj }, { pane: "ctx", coordsToLatLng: c => ll(c[0], c[1]), style: () => ({ stroke: false, fillColor: css("--ctx"), fillOpacity: 1 }), interactive: false }).addTo(lmap);
   });
   overlay = new CanvasOverlay(cv, b, { attribution: "Contains Met Office data © Crown copyright 2026 (OGL v3) | OS Open Names, GeoNames | Natural Earth" }).addTo(lmap);
-  const T2 = new Set(["Leeds", "Hull", "Liverpool", "Carlisle", "Aberystwyth", "Swansea", "Derry", "Dover", "Penzance", "Oban", "Ventnor", "Southampton"]);
-  L.layerGroup(CITIES.map(([nm, e, n]) => L.marker(ll(e, n), { interactive: false, icon: L.divIcon({ className: "city" + (T2.has(nm) ? " t2" : ""), html: `<i></i>${nm}`, iconSize: null, iconAnchor: [3, 6] }) }))).addTo(lmap);
-  const zc = () => lmap.getContainer().classList.toggle("zlo", lmap.getZoom() < -0.3); lmap.on("zoomend", zc); zc();
+  initLayers(b);
   lmap.on("click", () => lmap.scrollWheelZoom.enable());
   lmap.on("mousemove", ev => { const p = pxOf(ev.latlng.lng, ev.latlng.lat); const h = readSquare(p); document.getElementById("hov").innerHTML = h || "Hover or tap the map to read a square."; });
   lmap.on("click", ev => { const p = pxOf(ev.latlng.lng, ev.latlng.lat); if (p >= 0 && !isNaN(D.sunA[p])) { document.getElementById("hov").innerHTML = readSquare(p); choose({ name: nearestName(ev.latlng.lng, ev.latlng.lat) || "This square", e: ev.latlng.lng, n: ev.latlng.lat, how: "map" }, false); } });
@@ -800,10 +911,10 @@ document.querySelectorAll("#rsBtns .btn").forEach(b => b.onclick = () => { RS = 
 /* ===== start ===== */
 coastChart(); chgChart(); monChart();
 initMap();
-const baseP = loadBase().then(() => { [VX, VY] = viewArrays(); setBreaks(); renderAll(); }).catch(e => { msg.textContent = "The grids did not load."; console.error(e); });
-fetch("data/places_search.json").then(r => r.json()).then(p => { PLACES = p; });
+const baseP = loadBase().then(() => { [VX, VY] = viewArrays(); setBreaks(); renderAll(); buildLines(); }).catch(e => { msg.textContent = "The grids did not load."; console.error(e); });
+fetch("data/places_search.json").then(r => r.json()).then(p => { PLACES = p; placeNames(); });
 fetch("data/towns_page.json").then(r => r.json()).then(t => { TOWNS = t.rows; ranking(); });
-redraws.push(() => { if (D.land) renderAll(); pleasant(); });
+redraws.push(() => { if (D.land) { renderAll(); buildLines(); } pleasant(); });
 </script>
 </body>
 </html>
