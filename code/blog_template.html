@@ -1,0 +1,157 @@
+<!-- wp:paragraph -->
+<p><em>Is your corner of the UK sunny and dry, dull and wet, or one of the rare places that is both sunny and wet? I put every square kilometre of the country on both scales at once, then asked how much it has changed since the 1960s.</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://tristan-hotham.github.io/sun-and-rain-uk/">Explore the interactive version</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://doi.org/10.5281/zenodo.23732582">Read the paper</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:paragraph -->
+<p>A Met Office map went round social media recently that coloured the UK by sunshine and rainfall at the same time. I loved it, and I wanted to be able to poke at it: change the season, move the breaks, look up my own village, compare it with the past. The data behind maps like that are open. The Met Office's HadUK-Grid spreads the readings of the UK's weather stations onto a grid of one kilometre squares, and publishes thirty-year averages for each of them. So I built my own version, with my own colours, and made it interactive.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>There are {{meta.cells|int}} land squares. In 1991 to 2020 the average one got {{uk.sun|int}} hours of bright sunshine and {{uk.rain|int}} mm of rain a year. But averages hide the fun.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Sunny and dry, dull and wet</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>I split each measure into thirds of the land: the sunniest third, the middle third and the dullest third, and the same for rain. Crossing them gives nine colours. Marigold is sunny and dry, teal is dull and wet, the palest is dull and dry and a deep aubergine is sunny and wet.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_map.png|Map of the United Kingdom at 1 km coloured by sunshine and rainfall together. The south and east of England are marigold (sunny and dry); the Scottish Highlands, the Lake District and the Welsh hills are teal (dull and wet); Cornwall, Devon and parts of south west Wales are dark aubergine (sunny and wet). A key shows the shares of land: sunny and dry {{classes.sunny_dry.share|pct}}, dull and wet {{classes.dull_wet.share|pct}}, sunny and wet {{classes.sunny_wet.share|pct1}}, dull and dry {{classes.dull_dry.share|pct1}}.|Every 1 km square of the UK by sunshine and rainfall, 1991 to 2020. Each row and column of the key holds a third of the land.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Sunshine varies by a factor of {{uk.sun_ratio|f1}} across the country: from {{uk.sun_max|int}} hours a year on the shingle at Dungeness in Kent to {{uk.sun_min|int}} in the square that holds the summit of Ben Nevis. Rain varies by a factor of {{uk.rain_ratio|f1}}, from under 500 mm on the Isle of Sheppey to {{uk.rain_max|int}} mm in the fells at the head of Borrowdale in the Lake District.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The two pull hard against each other. Rank every square by sunshine and by rain and the correlation is {{uk.rho_sun_rain|f2}}. So two corners of the map are huge: sunny and dry covers {{classes.sunny_dry.share|pct}} of the land, mostly in the East of England, the South East and the East Midlands, and dull and wet {{classes.dull_wet.share|pct}}, three quarters of it in Scotland. If sun and rain had nothing to do with each other, each would cover about 11%.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_density.png|Chart of every 1 km square by annual sunshine (across) and rainfall (up, log scale), forming a broad band from sunny and dry at lower right to dull and wet at upper left, over the nine coloured classes. Towns are marked: Folkestone and Southend-on-Sea at the sunny, dry end; Fort William at the dull, wet end; Swansea and Plymouth on the sunny, wet side; Inverness on the dull, dry side.|Every square on both scales, with some towns marked. The dashed lines are the class breaks.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">The odd corners</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The other two corners are where it gets interesting. Sunny and wet is rare, {{classes.sunny_wet.share|pct1}} of the land, and almost all of it is in Cornwall, Devon, Carmarthenshire and Pembrokeshire. The far south west gets the Atlantic's rain and the south coast's sun. Swansea is the biggest town in it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Dull and dry is rarer still: {{classes.dull_dry.km2|int}} square kilometres, {{classes.dull_dry.share|pct1}} of the land, mostly around the Moray Firth in Highland and Moray. Those lowlands sit in the rain shadow of the Highlands, so the rain has fallen before the air reaches them, but they are far enough north for short winter days and plenty of cloud. Inverness is the only big town in it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>People cluster in the marigold. The towns of the sunny and dry third hold {{town_classes.sunny_dry.pop_share|pct}} of the people in UK towns of 15,000 or more, London among them. The dull and wet quarter holds {{town_classes.dull_wet.pop_share|pct1}}.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Head for the coast</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>If you want sun, go to the seaside. Of the sunniest 1% of squares, {{coast.top1_within5|pct}} are within 5 km of the sea, though only {{coast.land_within5|pct}} of Great Britain is. In England the first 2 km inland get {{coast.by_nation.England.coast2|int}} hours a year on average; more than 20 km inland it is {{coast.by_nation.England.inland20|int}}. In Wales the gap is even bigger. Cloud tends to bubble up over warm land during the day while the air over the sea stays clear.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_coast.png|Line chart of mean annual sunshine against distance from the sea for England, Wales and Scotland. All three lines fall with distance: England from {{coast.by_nation.England.coast2|int}} hours in the first 2 km, Wales from {{coast.by_nation.Wales.coast2|int}}, Scotland from {{coast.by_nation.Scotland.coast2|int}}.|Sunshine by distance from the sea, 1991 to 2020.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>The sunniest bigger towns are all on the Channel coast: Folkestone ({{towns.sunniest.0.sun|int}} hours), Sandown on the Isle of Wight and Dover. Among smaller towns, Ventnor on the Isle of Wight wins with {{os_towns.sunniest.0.sun|int}}. Fort William is both the dullest and the wettest bigger town, and the driest are in south Essex, where Southend-on-Sea gets {{towns.driest.0.rain|int}} mm a year.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Sunnier and wetter than the 1960s</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The Met Office also publishes the same averages for 1961 to 1990. Compare the two and the UK has become both sunnier and wetter: {{uk.sun_chg_h|int}} more hours of sun a year on average ({{uk.sun_chg_pct|f1}}%) and {{uk.rain_chg_mm|int}} mm more rain ({{uk.rain_chg_pct|f1}}%). {{change.sunnier_and_wetter|pct}} of the land got both. Using the same breaks for both periods, the sunniest class grew from {{change.top_sun_class_area.0|int}} to {{change.top_sun_class_area.1|int}} square kilometres.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_thennow.png|Two maps of the UK side by side, 1961 to 1990 and 1991 to 2020, coloured with the same sunshine and rainfall classes. In the later map the marigold sunny and dry area spreads north through the English Midlands and up the east coast.|The same classes, then and now. The sunniest class covered {{change.top_sun_class_area.0|int}} km² in 1961 to 1990 and {{change.top_sun_class_area.1|int}} km² in 1991 to 2020.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>The brightening was biggest in England ({{nation.England.sun_chg_pct|f1}}%) and smallest in Northern Ireland ({{nation.Northern Ireland.sun_chg_pct|f1}}%). Within England it was strongest in the North East ({{regions.4.sun_chg_pct|f1}}%) and the East Midlands ({{regions.7.sun_chg_pct|f1}}%). The towns that gained most are on Tyneside and in south Northumberland: Ashington, Blyth and Bedlington, all up by {{towns.gained.2.sun_chg_pct|f1}}% or more.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>The old industrial north east of England gained the most sunshine.</p></blockquote></figure>
+<!-- /wp:pullquote -->
+
+<!-- wp:image {"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full">{{IMG|b_changemap.png|Map of the percentage change in annual sunshine between 1961 to 1990 and 1991 to 2020. Almost all of the UK is orange (sunnier), darkest in north east England, Yorkshire and the Midlands; a few small patches in western Scotland and Northern Ireland are teal (duller). The map is mottled with round patches centred on individual weather stations.|Change in sunshine. The round patches are centred on single weather stations, so read the broad pattern, not your own square.}}</figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>I do not test why. Part of it may be the instruments: sunshine recorders changed over the decades, and the round blobs on the change map are the footprints of single stations. But the pattern fits a well-known story. Smoke and sulphur haze cleared after the Clean Air Acts of 1956 and 1968 and the decline of heavy industry, and climate scientists have described a wider "brightening" of sunshine across Europe since the 1980s.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Your square</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The interactive version is where to play. Type a place or postcode and you get that square's sunshine, rain and daytime highs for every month, how it ranks in the UK and how it has changed since 1961 to 1990. Then press "Where else has weather like this?" and the map lights up every square with similar sun and rain. You can switch to any month or season (May is the sunniest month across the UK; December the dullest and wettest), set your own class breaks, light up any one colour from the key, and count the months that are pleasantly warm where you live. With highs of 18 to 27 °C, {{pleasant.18_27.share_zero|pct}} of the UK has none at all, and nowhere has more than {{pleasant.18_27.max|int}}.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">How I did this</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The data are the Met Office's HadUK-Grid version 1.3.2 thirty-year averages at 1 km: annual sunshine and rainfall for 1961 to 1990 and 1991 to 2020, and monthly sunshine, rainfall and maximum temperature for 1991 to 2020. The class breaks are the thirds of the UK's land, so each row and column of the key covers the same area. Towns take the average of the 3 km block around their point in GeoNames (towns of 15,000 or more) or OS Open Names. The colours are my own, mixed from four corners. A grid is a model of the weather between stations, not a measurement in every square, so treat hilltop and remote values, and the change map, as broad patterns. The full method and caveats are in the paper.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://tristan-hotham.github.io/sun-and-rain-uk/">Explore the interactive version</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://doi.org/10.5281/zenodo.23732582">Read the paper</a></div>
+<!-- /wp:button -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://github.com/Tristan-Hotham/sun-and-rain-uk">Data and code</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Notes and sources</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Climate data: Met Office; Hollis, D., McCarthy, M., Kendon, M. and Legg, T. (2026) <a href="https://catalogue.ceda.ac.uk/uuid/789b3065d74a4c948ab05d33556c86d0">HadUK-Grid Gridded Climate Observations on a 1km grid over the UK, v1.3.2.ceda (1836 to 2025)</a>, NERC EDS Centre for Environmental Data Analysis. Contains Met Office data © Crown copyright 2026, Open Government Licence v3.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Places: <a href="https://www.ordnancesurvey.co.uk/products/os-open-names">OS Open Names</a>, contains OS data © Crown copyright and database right 2026 (Open Government Licence v3.0); <a href="https://www.geonames.org">GeoNames</a> (CC BY 4.0). Context land: <a href="https://www.naturalearthdata.com">Natural Earth</a> (public domain).</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Background: Hollis et al. (2019), HadUK-Grid, Geoscience Data Journal; Wild (2009), Global dimming and brightening: a review, Journal of Geophysical Research; Wikipedia, <a href="https://en.wikipedia.org/wiki/Clean_Air_Act_1956">Clean Air Act 1956</a>.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>The world version of this map: <a href="https://tristan-hotham.github.io/sun-and-rain/">Sun and rain: the world's sunshine against its rainfall</a>. Pleasantly warm months worldwide: <a href="https://tristan-hotham.github.io/pleasant-months/">How many months a year are pleasantly warm?</a></li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>Data files: Open Government Licence v3; text and figures: CC BY 4.0; code: MIT.</li>
+<!-- /wp:list-item -->
+<!-- wp:list-item -->
+<li>I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->

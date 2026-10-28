@@ -1,0 +1,203 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
+\newfontfamily\headfont{Inter}[UprightFont=*-ExtraBold,BoldFont=*-ExtraBold,Extension=.otf,Path=/usr/share/fonts/opentype/inter/]
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{graphicx,booktabs,float,caption,array,amsmath}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\usepackage{setspace}
+\setstretch{1.05}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\titleformat{\section}{\headfont\Large}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\headfont\large}{\thesubsection}{0.8em}{}
+\captionsetup{font=small,labelfont=bf}
+\urlstyle{same}
+\hypersetup{pdftitle={Sun and Rain: The United Kingdom's Sunshine Against Its Rainfall at 1 km, 1961 to 2020},pdfauthor={Tristan Hotham}}
+
+\begin{document}
+\begin{center}
+{\Large\bfseries Sun and Rain:\\[2pt] The United Kingdom's Sunshine Against Its Rainfall\\[2pt] at 1 km, 1961 to 2020\par}
+\vspace{1.2em}
+{\large Tristan Hotham\par}
+\vspace{0.3em}
+{\small Independent researcher\\
+ORCID: 0000-0003-4931-9349\\
+DOI: \href{https://doi.org/10.5281/zenodo.23732582}{https://doi.org/10.5281/zenodo.23732582}\par}
+\vspace{0.8em}
+2026
+\end{center}
+
+\begin{quote}
+\small
+\begin{center}\textbf{Abstract}\end{center}
+Sunshine and rainfall are the two numbers most people use to describe the weather of a place, but they are usually mapped one at a time. I map them together for every 1 km square of the United Kingdom, using the Met Office's HadUK-Grid thirty-year averages for 1961 to 1990 and 1991 to 2020, with a three by three bivariate colour scheme whose breaks are the terciles of the land. Across {{meta.cells|int}} squares, annual sunshine in 1991 to 2020 ranges from {{uk.sun_min|int}} hours on the summit of Ben Nevis to {{uk.sun_max|int}} hours at Dungeness, and rainfall from under 500 mm on the Isle of Sheppey to {{uk.rain_max|int}} mm at the head of Borrowdale. The two are strongly and negatively related (Spearman's $\rho$ = {{uk.rho_sun_rain|f2}}), so two corners of the bivariate scheme dominate: sunny and dry squares cover {{classes.sunny_dry.share|pct}} of the land and dull and wet squares {{classes.dull_wet.share|pct}}, while sunny and wet squares ({{classes.sunny_wet.share|pct1}}, mostly in Cornwall, Devon and south west Wales) and dull and dry squares ({{classes.dull_dry.share|pct1}}, around the Moray Firth) are rare. The towns of the sunny and dry third hold {{town_classes.sunny_dry.pop_share|pct}} of the population of UK towns of 15,000 or more. The sunniest 1\% of squares lie overwhelmingly within 5 km of the sea. Between the two periods the UK became {{uk.sun_chg_pct|f1}}\% sunnier and {{uk.rain_chg_pct|f1}}\% wetter on average; {{change.sunnier_and_wetter|pct}} of the land became both. The brightening was largest in England ({{nation.England.sun_chg_pct|f1}}\%), especially the North East and East Midlands, and smallest in Northern Ireland. Gridded values rest on interpolation between stations and on changing instruments, so they describe broad patterns better than individual squares. An interactive version lets readers change the season, the breaks and the period, and look up any place.
+
+\textbf{Keywords:} sunshine; rainfall; climate normals; HadUK-Grid; bivariate map; United Kingdom; brightening; coastal climate; open data; data visualisation
+\end{quote}
+
+\section{Introduction}
+
+Ask someone in Britain what the weather is like somewhere and the answer usually comes in two parts: whether it is sunny, and whether it rains. The two are related, since cloud brings both dull skies and rain, but they are not the same thing. A place can be wet without being especially dull if its rain comes in short, heavy bursts between clear spells, and a place can be dry and still grey if it sits under persistent low cloud that rarely rains out. Maps usually show one or the other. A bivariate map, which colours each place by its position on two scales at once, can show both together and make the exceptions visible (Trumbo 1981).
+
+This note builds such a map for the United Kingdom at the finest scale the official gridded climate data allow: 1 km. It uses the Met Office's HadUK-Grid dataset (Hollis et al. 2019; Met Office et al. 2026), which interpolates station observations onto a regular grid on the British National Grid, and its thirty-year averages, or normals, for 1961 to 1990 and 1991 to 2020. It asks four questions. How are sunshine and rainfall arranged across the UK, and how tightly are they tied together? Where are the unusual combinations, sunny and wet or dull and dry, and who lives there? What role does the coast play? And how did the two change between the two thirty-year periods?
+
+The work was prompted by a widely shared Met Office map of sunshine against rainfall. I do not copy that map's design or palette; the aim is to build an open, reproducible and interactive version in which the reader can change the question: switch between the year, a season or a month, move the class breaks, compare the two periods with the same breaks, and look up any place or postcode. The interactive version is at \url{https://tristan-hotham.github.io/sun-and-rain-uk/}.
+
+\section{Data}
+
+\subsection{HadUK-Grid}
+
+HadUK-Grid is the Met Office's collection of gridded climate observations for the UK (Hollis et al. 2019). Daily and monthly observations from the national network of weather stations are interpolated onto a 1 km grid by a regression on geographic factors (such as elevation, distance from the coast, latitude and urban land use) followed by inverse-distance weighting of the residuals. I used version 1.3.2 as published through the NERC EDS Centre for Environmental Data Analysis (Met Office et al. 2026): the annual thirty-year averages of total sunshine hours and total rainfall for 1961 to 1990 and for 1991 to 2020, and the monthly thirty-year averages of sunshine, rainfall and mean daily maximum temperature for 1991 to 2020. The grid has 900 columns and 1,450 rows of 1 km cells on the Ordnance Survey's British National Grid; {{meta.cells|int}} cells are land, and every one of the seven files has values on exactly the same cells. HadUK-Grid is published under the Open Government Licence v3.
+
+Sunshine in HadUK-Grid means bright sunshine: the time for which the direct sun is strong enough to register on a sunshine recorder. Rainfall means total precipitation, including melted snow, in millimetres. The monthly normals are averages of the thirty values for each calendar month, so the annual sunshine normal is very close to, but not necessarily exactly, the sum of the monthly normals.
+
+\subsection{Places}
+
+To name squares and rank towns I used two gazetteers. OS Open Names (Ordnance Survey 2026) gives the positions of cities, towns and villages in Great Britain, with their county and English region, Scotland or Wales. GeoNames (2026) gives the positions and populations of places of 15,000 or more people worldwide; I kept the {{towns_n|int}} UK places that are not merely sections of other places, with a total listed population of {{towns_pop|int}}. GeoNames populations come from mixed sources and years, so I use them only to weight and filter, not as exact counts. Natural Earth land polygons (public domain) are drawn in grey on the maps for context.
+
+\section{Methods}
+
+\subsection{Bivariate classes}
+
+Each square has a sunshine value and a rainfall value. I divide each scale into three classes at its terciles, computed over all land squares with each square counting as one square kilometre, so that each class holds a third of the UK's land. Crossing the two gives nine classes. For 1991 to 2020 the sunshine terciles are {{breaks.sun3.0|int}} and {{breaks.sun3.1|int}} hours a year, and the rainfall terciles {{breaks.rain3.0|int}} and {{breaks.rain3.1|int}} mm. I call the corners ``sunny and dry'' (top sunshine class, bottom rainfall class), ``sunny and wet'', ``dull and dry'' and ``dull and wet'', and the centre class ``middling''. If sunshine and rainfall were independent, each class would hold a ninth of the land; departures from a ninth measure how the two are tied together.
+
+The colours are my own. Four corner colours, a pale paper tone for dull and dry, marigold for sunny and dry, teal for dull and wet and a deep aubergine for sunny and wet, are mixed bilinearly in the CIELAB colour space to give the nine (or, in the four by four option on the interactive page, sixteen) classes. Lightness falls from the pale corner to the dark one, so the two extreme corners stay distinct in greyscale; the two off-diagonal corners differ in hue.
+
+For comparisons between periods, I keep the 1991 to 2020 breaks fixed and apply them to 1961 to 1990, so that a change of class means a change of climate, not a change of breaks. I also report percentage change in each square, $100 \times (x_{1991\text{ to }2020}/x_{1961\text{ to }1990} - 1)$.
+
+\subsection{Regions, towns and the coast}
+
+Each land square takes the region (one of the nine English regions, Scotland or Wales) of its nearest OS Open Names populated place. Northern Ireland, which OS Open Names does not cover, is the connected block of land squares containing Belfast, plus any islet closer to it than to a place in Great Britain. Each town takes the mean of the land squares in the 3 km by 3 km block around its point; a town whose point falls in the sea takes its nearest land square. Distance from the sea is the Euclidean distance from each square's centre to the nearest non-land cell of the grid, computed for Great Britain only, because Northern Ireland's land border with the Republic of Ireland would otherwise count as coast.
+
+\subsection{Months, seasons and warm months}
+
+Seasons are sums of the monthly normals: winter is December to February, spring March to May, summer June to August and autumn September to November. As a link to a sister study of the whole world, I also count for each square the number of months whose mean daily maximum temperature lies in a band, by default 18 to 27 $^\circ$C.
+
+\subsection{The interactive page}
+
+To keep the page fast, the grids are stored as 8-bit PNG images: one each for the annual normals of the two periods, one for the percentage changes and one for each month. Annual sunshine is stored in 6 hour steps (error at most {{meta.quant_err.sun_a|int}} hours), rainfall on a logarithmic scale (error under 1\%), monthly sunshine in 1.2 hour steps and temperatures in eighths of a degree. Every number in this note and on the page's text comes from the full-precision data; the stored grids are used only for colouring the map and for readouts.
+
+\section{Results}
+
+\subsection{The national pattern}
+
+Across the UK in 1991 to 2020, the average land square received {{uk.sun|int}} hours of bright sunshine and {{uk.rain|int}} mm of rain a year. Figure~\ref{fig:map} shows the bivariate map. The broad division is familiar: the south and east of England are sunny and dry; the Scottish Highlands, the Lake District, Snowdonia and the uplands of south Wales are dull and wet; and most of the rest sits in between.
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.92\textwidth]{f_map.png}
+\caption{Sunshine against rainfall, 1991 to 2020, for every 1 km square of the UK, in three classes of each at the terciles of the land. Data: HadUK-Grid v1.3.2 (Met Office).}\label{fig:map}
+\end{figure}
+
+Sunshine varies by a factor of {{uk.sun_ratio|f1}} across the land. The sunniest square, at {{uk.sun_max|int}} hours, is on the shingle at Dungeness in Kent. The dullest, at {{uk.sun_min|int}} hours, is the square containing the summit of Ben Nevis (grid reference NN 166 712). Rainfall varies by a factor of {{uk.rain_ratio|f1}}. The wettest square, with {{uk.rain_max|int}} mm, lies in the fells at the head of Borrowdale in the Lake District. The driest is a single coastal square at the mouth of the Tees with {{uk.driest.rain|int}} mm, but its eight neighbours average {{uk.driest.neighbours_mean|int}} mm, so I treat it as an artefact at the edge of the grid; the driest land away from it is on the Isle of Sheppey in Kent, at {{uk.driest_other.rain|int}} mm. Four in five squares lie between {{uk.sun_p10|int}} and {{uk.sun_p90|int}} hours of sun (10th and 90th percentiles) and between {{uk.rain_p10|int}} and {{uk.rain_p90|int}} mm of rain.
+
+Sunshine and rainfall are strongly and negatively related: the Spearman rank correlation across all squares is {{uk.rho_sun_rain|f2}} for 1991 to 2020 and {{uk.rho_sun_rain_6190|f2}} for 1961 to 1990. Figure~\ref{fig:density} shows every square on the two axes, with the class breaks. The squares form a broad band running from sunny and dry at the lower right to dull and wet at the upper left. The correlation is strong in every season, from {{seasons.spring.rho|f2}} in spring to {{seasons.winter.rho|f2}} in winter.
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.9\textwidth]{f_density.png}
+\caption{Every land square by annual sunshine and rainfall (log scale), 1991 to 2020, shaded by density, over the nine classes. Dashed lines: terciles. Points: selected towns (the mean of the 3 km block around each town).}\label{fig:density}
+\end{figure}
+
+\subsection{Four corners}
+
+Because of that correlation, the nine classes are far from equal (Table~\ref{tab:classes}). The two ``expected'' corners hold almost half the land: sunny and dry covers {{classes.sunny_dry.share|pct}} ({{classes.sunny_dry.km2|int}} km\textsuperscript{2}) and dull and wet {{classes.dull_wet.share|pct}} ({{classes.dull_wet.km2|int}} km\textsuperscript{2}), against 11\% each if the two measures were independent. Sunny and dry land is concentrated in the East of England ({{classes.sunny_dry.top_regions.0.share|pct}} of it), the South East ({{classes.sunny_dry.top_regions.1.share|pct}}) and the East Midlands ({{classes.sunny_dry.top_regions.2.share|pct}}). {{classes.dull_wet.top_regions.0.share|pct}} of the dull and wet land is in Scotland.
+
+{{TABLE_CLASSES}}
+
+The other two corners are rare. Sunny and wet squares cover {{classes.sunny_wet.share|pct1}} of the land ({{classes.sunny_wet.km2|int}} km\textsuperscript{2}). They are mostly in Cornwall ({{classes.sunny_wet.top_counties.0.share|pct}}) and Devon ({{classes.sunny_wet.top_counties.1.share|pct}}), with smaller areas in Carmarthenshire and Pembrokeshire: the far south west, which is exposed to Atlantic rain but also gets the high sunshine of the southern coasts. Dull and dry squares are rarest of all, {{classes.dull_dry.share|pct1}} of the land ({{classes.dull_dry.km2|int}} km\textsuperscript{2}), {{classes.dull_dry.top_counties.0.share|pct}} of them in Highland and {{classes.dull_dry.top_counties.1.share|pct}} in Moray, around the Moray Firth. These lowlands lie in the rain shadow of the Highlands, so they are dry, but at their latitude winter days are short and sunshine totals are modest.
+
+People are not spread like land. Of the {{towns_n|int}} UK towns of 15,000 or more, {{town_classes.sunny_dry.n|int}} fall in the sunny and dry class, and they hold {{town_classes.sunny_dry.pop_share|pct}} of the population of all such towns, London included. The dull and wet class holds {{town_classes.dull_wet.n|int}} towns (among them Rochdale, Rossendale, Cumbernauld and Greenock) with {{town_classes.dull_wet.pop_share|pct1}} of the population; the sunny and wet class {{town_classes.sunny_wet.n|int}} towns, led by Swansea, with {{town_classes.sunny_wet.pop_share|pct1}}; and the dull and dry class one town, Inverness. Glasgow, Manchester and Liverpool are in the middling class.
+
+\subsection{The bright coast}
+
+The sunniest squares are coastal. Of the 1\% of squares with the most sunshine (at least {{coast.top1_threshold|int}} hours a year), {{coast.top1_within5|pct}} lie within 5 km of the sea, although only {{coast.land_within5|pct}} of Great Britain's land does; {{coast.top1_regions.0.share|pct}} of them are in the South East region. Within each nation, sunshine falls steadily with distance from the sea (Figure~\ref{fig:coast}): in England from {{coast.by_nation.England.coast2|int}} hours a year in the first 2 km to {{coast.by_nation.England.inland20|int}} more than 20 km inland, in Wales from {{coast.by_nation.Wales.coast2|int}} to {{coast.by_nation.Wales.inland20|int}}, and in Scotland from {{coast.by_nation.Scotland.coast2|int}} to {{coast.by_nation.Scotland.inland20|int}}. Pooled across Great Britain the effect almost vanishes ({{coast.sun_coast2|int}} against {{coast.sun_inland20|int}} hours), because so much of the coastline is in Scotland; the comparison has to be made within nations. A likely reason for the coastal advantage is that convective cloud builds over land as it warms during the day, while air over the cooler sea stays clearer; HadUK-Grid's regression uses geographic predictors that can include coastal influence, so the gradient is partly a product of the method as well as of the stations.
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.85\textwidth]{f_coast.png}
+\caption{Mean annual sunshine, 1991 to 2020, of 1 km squares by distance from the sea, for England, Wales and Scotland. Bands with fewer than 200 squares are omitted.}\label{fig:coast}
+\end{figure}
+
+\subsection{Then and now}
+
+Between 1961 to 1990 and 1991 to 2020 the UK's average square gained {{uk.sun_chg_h|int}} hours of sunshine a year ({{uk.sun_chg_pct|f1}}\%) and {{uk.rain_chg_mm|int}} mm of rain ({{uk.rain_chg_pct|f1}}\%). {{change.share_sunnier|pct}} of the land became sunnier and {{change.share_wetter|pct}} wetter; {{change.sunnier_and_wetter|pct}} became both, and only {{change.share_duller|pct1}} became duller. Applying the 1991 to 2020 breaks to both periods, the sunniest class (more than {{breaks.sun3.1|int}} hours) grew from {{change.top_sun_class_area.0|int}} km\textsuperscript{2} to {{change.top_sun_class_area.1|int}} km\textsuperscript{2} (Figure~\ref{fig:thennow}), and the land with more than 1,600 hours from {{change.area_over_1600.0|int}} to {{change.area_over_1600.1|int}} km\textsuperscript{2}.
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.92\textwidth]{f_thennow.png}
+\caption{The bivariate map for 1961 to 1990 and 1991 to 2020, both classed with the 1991 to 2020 terciles.}\label{fig:thennow}
+\end{figure}
+
+The brightening was uneven (Table~\ref{tab:regions}, Figure~\ref{fig:changemap}). It was largest in England ({{nation.England.sun_chg_pct|f1}}\%) and smallest in Northern Ireland ({{nation.Northern Ireland.sun_chg_pct|f1}}\%), with Scotland at {{nation.Scotland.sun_chg_pct|f1}}\% and Wales at {{nation.Wales.sun_chg_pct|f1}}\%. Within England, the North East ({{regions.4.sun_chg_pct|f1}}\%) and the East Midlands ({{regions.7.sun_chg_pct|f1}}\%) gained most and the South West least ({{regions.12.sun_chg_pct|f1}}\%). Among towns of 15,000 or more, the largest gains were on Tyneside and in south Northumberland: Ashington ({{towns.gained.0.sun_chg_pct|f1}}\%), Blyth and Bedlington ({{towns.gained.1.sun_chg_pct|f1}}\% each). {{towns.share_sunnier|pct}} of these towns became sunnier. Rainfall rose most in Scotland ({{nation.Scotland.rain_chg_pct|f1}}\%) and least in London ({{regions.10.rain_chg_pct|f1}}\%).
+
+{{TABLE_REGIONS}}
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.8\textwidth]{f_changemap.png}
+\caption{Percentage change in annual sunshine from 1961 to 1990 to 1991 to 2020. The roughly circular patches are centred on individual stations whose records changed more or less than their neighbours'.}\label{fig:changemap}
+\end{figure}
+
+The change map has a texture that the maps of the normals do not: roughly circular patches of strong or weak change, a few tens of kilometres across. These are the footprints of individual stations, spread by the interpolation, and they are a warning that local changes in the grid partly reflect the history of particular instruments and sites. The broad pattern, a strong brightening over the industrial North East, Yorkshire and the Midlands and a weaker one in the far south west, Northern Ireland and western Scotland, is more robust. It is consistent with the recovery of surface sunshine reported across Europe since the 1980s, often called brightening and widely attributed in part to falling air pollution (Wild 2009), and with the cleaner air that followed the Clean Air Acts of 1956 and 1968 and the decline of heavy industry. I do not test these causes here. The general rise in rainfall is consistent with the Met Office's reports of wetter recent decades in the UK, particularly in Scotland (Kendon et al. 2024).
+
+\subsection{Through the year}
+
+Across the UK, May is the sunniest month on average and December the dullest and the wettest; May is also the driest (Figure~\ref{fig:months}). May is the sunniest month in {{month_stats.sunniest_month_share.May|pct}} of squares and July in {{month_stats.sunniest_month_share.July|pct}}, almost all of them in the south and east. The wettest month is more varied: December in {{month_stats.wettest_month_share.December|pct}} of squares, October in {{month_stats.wettest_month_share.October|pct}}, November in {{month_stats.wettest_month_share.November|pct}} and January in {{month_stats.wettest_month_share.January|pct}}. Winter carries more of the year's rain in wet places: {{seasons.winter_share_wet_tercile|pct}} of annual rainfall falls in December to February in the wettest third of the land, against {{seasons.winter_share_dry_tercile|pct}} in the driest third. The contrast in sunshine is starkest in December, from {{month_stats.dec_sun_max|int}} hours at Ventnor on the Isle of Wight to {{month_stats.dec_sun_min|int}} hours in parts of Shetland.
+
+\begin{figure}[tbp]\centering
+\includegraphics[width=0.92\textwidth]{f_months.png}
+\caption{Monthly sunshine and rainfall, 1991 to 2020: the mean of each nation's 1 km squares.}\label{fig:months}
+\end{figure}
+
+With the band of 18 to 27 $^\circ$C used in the world study, {{pleasant.18_27.share_zero|pct}} of the UK's land has no month whose mean daily maximum falls in it, and no square has more than {{pleasant.18_27.max|int}}; the warmest July average, {{pleasant.warmest_july.tmax|f1}} $^\circ$C, is in London. With a band of 15 to 25 $^\circ$C, only {{pleasant.15_25.share_zero|pct1}} of the land has none, and the most is {{pleasant.15_25.max|int}}.
+
+\subsection{Towns}
+
+Table~\ref{tab:towns} ranks the towns of 15,000 or more. The sunniest are on the Channel coast: Folkestone ({{towns.sunniest.0.sun|int}} hours), Sandown on the Isle of Wight and Dover. Among all {{os_towns_n|int}} cities and towns in OS Open Names, Ventnor tops the list with {{os_towns.sunniest.0.sun|int}} hours. Fort William is both the dullest ({{towns.dullest.0.sun|int}} hours) and the wettest ({{towns.wettest.0.rain|int}} mm) of the larger towns, followed on rain by the Rhondda and other valley towns of south Wales. The driest are in south Essex, led by Southend-on-Sea ({{towns.driest.0.rain|int}} mm). Among the 30 places of 250,000 or more, Southend is the sunniest and Belfast the dullest ({{towns.cities250k.29.sun|int}} hours); London has {{town_lookup.London.sun|int}} hours and {{town_lookup.London.rain|int}} mm.
+
+{{TABLE_TOWNS}}
+
+\section{Discussion}
+
+The map confirms the British stereotype of a sunny, dry south east and a dull, wet north west, but it also gives it numbers and shows where it breaks down. The strength of the negative correlation means that, for most of the country, knowing one measure tells you much about the other. The interesting places are the exceptions. The sunny and wet south west and the dull and dry Moray Firth are each a product of geography: exposure to the Atlantic and to the sun of the southern coast in one case, shelter from westerly rain at a high latitude in the other. The coastal effect is the other notable pattern: for sunshine, being near the sea matters almost as much within a nation as being in the south.
+
+The change between the two normal periods is large. A gain of {{uk.sun_chg_pct|f1}}\% in sunshine in thirty years, with the biggest gains in the old industrial regions, is a reminder that ``the UK's climate'' in reference books based on 1961 to 1990 is out of date for sunshine as well as for temperature. The fact that the UK also became wetter, and that {{change.sunnier_and_wetter|pct}} of the land became both, shows that the two measures can move together over time even though they are opposed across space.
+
+\section{Limitations}
+
+First, these are interpolated grids. HadUK-Grid estimates the climate of every square from stations and geographic predictors; in the mountains and the remote north and west, where stations are sparse, values are estimates with considerable uncertainty, and the extreme squares (Ben Nevis, Borrowdale) should be read as model values. Second, sunshine measurements changed over the period: the network moved over the decades from Campbell-Stokes glass sphere recorders to automatic electronic sensors, which do not record identically, and stations opened and closed. Part of the change between the two periods may therefore be instrumental; the station-centred patches in Figure~\ref{fig:changemap} show that local histories matter. Third, thirty-year averages hide year-to-year variability and any trend within each period. Fourth, the town values are for a 3 km block around a point and may differ from the climate of a town's edges or hills. Fifth, GeoNames populations are approximate and of mixed date. Sixth, the bivariate classes depend on the breaks; the interactive version lets the reader change them.
+
+\section{Conclusion}
+
+Mapped together at 1 km, sunshine and rainfall divide the UK into a sunny and dry fifth in the south and east, a dull and wet quarter mostly in Scotland, and rare sunny and wet and dull and dry corners in the far south west and around the Moray Firth. The sunniest places are on the southern coasts. Between 1961 to 1990 and 1991 to 2020 the country became both sunnier and wetter, with the largest gains in sunshine in the industrial north east of England and the Midlands. The data are open, and the interactive version lets anyone explore their own square.
+
+\section*{Data and code availability}
+
+Data and code: \url{https://github.com/Tristan-Hotham/sun-and-rain-uk}. Interactive version: \url{https://tristan-hotham.github.io/sun-and-rain-uk/}. Archived release: \url{https://doi.org/10.5281/zenodo.23732582}. The derived data files contain Met Office data \textcopyright\ Crown copyright 2026 and OS data \textcopyright\ Crown copyright and database right 2026, released under the Open Government Licence v3; the text and figures are released under CC BY 4.0 and the code under the MIT licence.
+
+\section*{AI statement}
+
+I wrote the text, with drafting and editing assistance from Claude (Anthropic), which also helped prepare the analysis code. I reviewed and checked all text and results.
+
+\section*{References}
+\small
+GeoNames (2026) Cities with a population over 15,000 (cities15000). CC BY 4.0. \url{https://download.geonames.org/export/dump/}
+
+Hollis, D., McCarthy, M., Kendon, M., Legg, T. and Simpson, I. (2019) HadUK-Grid: a new UK dataset of gridded climate observations. \emph{Geoscience Data Journal} 6(2): 151 to 159.
+
+Kendon, M. et al. (2024) State of the UK Climate 2023. \emph{International Journal of Climatology} 44(S1).
+
+Met Office, Hollis, D., McCarthy, M., Kendon, M. and Legg, T. (2026) HadUK-Grid Gridded Climate Observations on a 1km grid over the UK, v1.3.2.ceda (1836 to 2025). NERC EDS Centre for Environmental Data Analysis. Open Government Licence v3. \url{https://catalogue.ceda.ac.uk/uuid/789b3065d74a4c948ab05d33556c86d0}
+
+Natural Earth (2026) 1:10m land polygons. Public domain. \url{https://www.naturalearthdata.com}
+
+Ordnance Survey (2026) OS Open Names. Open Government Licence v3.0. \url{https://www.ordnancesurvey.co.uk/products/os-open-names}
+
+Trumbo, B. E. (1981) A theory for coloring bivariate statistical maps. \emph{The American Statistician} 35(4): 220 to 226.
+
+Wikipedia contributors (2026) Clean Air Act 1956. English Wikipedia. \url{https://en.wikipedia.org/wiki/Clean_Air_Act_1956} (accessed 28 October 2026).
+
+Wild, M. (2009) Global dimming and brightening: a review. \emph{Journal of Geophysical Research: Atmospheres} 114: D00D16.
+\end{document}
