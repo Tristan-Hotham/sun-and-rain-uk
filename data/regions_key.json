@@ -1,0 +1,30 @@
+{
+ "codes": [
+  "North East",
+  "North West",
+  "Yorkshire and the Humber",
+  "East Midlands",
+  "West Midlands",
+  "East of England",
+  "London",
+  "South East",
+  "South West",
+  "Wales",
+  "Scotland",
+  "Northern Ireland"
+ ],
+ "nation": {
+  "North East": "England",
+  "North West": "England",
+  "Yorkshire and the Humber": "England",
+  "East Midlands": "England",
+  "West Midlands": "England",
+  "East of England": "England",
+  "London": "England",
+  "South East": "England",
+  "South West": "England",
+  "Wales": "Wales",
+  "Scotland": "Scotland",
+  "Northern Ireland": "Northern Ireland"
+ }
+}

@@ -1,0 +1,3151 @@
+{
+ "meta": {
+  "cells": 245077,
+  "area_km2": 245077,
+  "periods": [
+   "1961 to 1990",
+   "1991 to 2020"
+  ],
+  "version": "HadUK-Grid v1.3.2.ceda",
+  "quant_err": {
+   "sun_a": 3.0,
+   "rain_a_pct": 0.5345021019926843,
+   "sun_m": 0.600006103515625,
+   "rain_m_pct": 0.7858744410390583,
+   "tmax": 0.0625009536743164
+  }
+ },
+ "uk": {
+  "sun": 1403.0,
+  "rain": 1162.0,
+  "sun6190": 1328.0,
+  "rain6190": 1084.0,
+  "sun_chg_pct": 5.6,
+  "rain_chg_pct": 7.2,
+  "sun_chg_h": 75.0,
+  "rain_chg_mm": 79.0,
+  "sun_min": 784.0,
+  "sun_max": 1992.0,
+  "rain_min": 469.0,
+  "rain_max": 4796.0,
+  "sun_ratio": 2.5,
+  "rain_ratio": 10.2,
+  "sun_p10": 1125.0,
+  "sun_p90": 1638.0,
+  "rain_p10": 639.0,
+  "rain_p90": 1949.0,
+  "sun_median": 1428.0,
+  "rain_median": 986.0,
+  "sunniest": {
+   "near": "Dungeness",
+   "county": "Kent",
+   "km": 0.3,
+   "e_km": 609.5,
+   "n_km": 117.5,
+   "region": "South East",
+   "sun": 1992.0,
+   "rain": 704.0
+  },
+  "dullest": {
+   "near": "Torlundy",
+   "county": "Highland",
+   "km": 5.9,
+   "e_km": 216.5,
+   "n_km": 771.5,
+   "region": "Scotland",
+   "sun": 784.0,
+   "rain": 3740.0
+  },
+  "wettest": {
+   "near": "Rosthwaite",
+   "county": "Cumberland",
+   "km": 4.9,
+   "e_km": 322.5,
+   "n_km": 510.5,
+   "region": "North West",
+   "sun": 1258.0,
+   "rain": 4796.0
+  },
+  "driest": {
+   "near": "Easington",
+   "county": "Redcar and Cleveland",
+   "km": 1.8,
+   "e_km": 475.5,
+   "n_km": 519.5,
+   "region": "North East",
+   "sun": 1610.0,
+   "rain": 469.0,
+   "neighbours_mean": 599.0
+  },
+  "driest_other": {
+   "near": "Bay View",
+   "county": "Kent",
+   "km": 0.3,
+   "e_km": 601.5,
+   "n_km": 170.5,
+   "region": "South East",
+   "sun": 1849.0,
+   "rain": 493.0
+  },
+  "rho_sun_rain": -0.72,
+  "rho_sun_rain_6190": -0.63
+ },
+ "regions": [
+  {
+   "level": "nation",
+   "name": "England",
+   "area_km2": 130576,
+   "sun": 1539.0,
+   "rain": 869.0,
+   "sun6190": 1431.0,
+   "rain6190": 820.0,
+   "sun_chg_pct": 7.5,
+   "rain_chg_pct": 6.0,
+   "sun_chg_h": 108.0,
+   "share_sunnier": 0.983,
+   "share_wetter": 0.985
+  },
+  {
+   "level": "nation",
+   "name": "Scotland",
+   "area_km2": 79362,
+   "sun": 1203.0,
+   "rain": 1569.0,
+   "sun6190": 1168.0,
+   "rain6190": 1442.0,
+   "sun_chg_pct": 3.0,
+   "rain_chg_pct": 8.8,
+   "sun_chg_h": 35.0,
+   "share_sunnier": 0.833,
+   "share_wetter": 0.986
+  },
+  {
+   "level": "nation",
+   "name": "Wales",
+   "area_km2": 20813,
+   "sun": 1409.0,
+   "rain": 1459.0,
+   "sun6190": 1353.0,
+   "rain6190": 1375.0,
+   "sun_chg_pct": 4.1,
+   "rain_chg_pct": 6.2,
+   "sun_chg_h": 55.0,
+   "share_sunnier": 0.928,
+   "share_wetter": 0.974
+  },
+  {
+   "level": "nation",
+   "name": "Northern Ireland",
+   "area_km2": 14326,
+   "sun": 1259.0,
+   "rain": 1153.0,
+   "sun6190": 1237.0,
+   "rain6190": 1087.0,
+   "sun_chg_pct": 1.8,
+   "rain_chg_pct": 6.1,
+   "sun_chg_h": 23.0,
+   "share_sunnier": 0.764,
+   "share_wetter": 0.992
+  },
+  {
+   "level": "region",
+   "name": "North East",
+   "area_km2": 8495,
+   "sun": 1442.0,
+   "rain": 887.0,
+   "sun6190": 1297.0,
+   "rain6190": 828.0,
+   "sun_chg_pct": 11.1,
+   "rain_chg_pct": 7.2,
+   "sun_chg_h": 144.0,
+   "share_sunnier": 1.0,
+   "share_wetter": 0.989
+  },
+  {
+   "level": "region",
+   "name": "North West",
+   "area_km2": 14307,
+   "sun": 1383.0,
+   "rain": 1278.0,
+   "sun6190": 1304.0,
+   "rain6190": 1201.0,
+   "sun_chg_pct": 6.1,
+   "rain_chg_pct": 6.3,
+   "sun_chg_h": 79.0,
+   "share_sunnier": 1.0,
+   "share_wetter": 0.977
+  },
+  {
+   "level": "region",
+   "name": "Yorkshire and the Humber",
+   "area_km2": 15431,
+   "sun": 1432.0,
+   "rain": 864.0,
+   "sun6190": 1316.0,
+   "rain6190": 823.0,
+   "sun_chg_pct": 8.8,
+   "rain_chg_pct": 4.9,
+   "sun_chg_h": 116.0,
+   "share_sunnier": 1.0,
+   "share_wetter": 0.965
+  },
+  {
+   "level": "region",
+   "name": "East Midlands",
+   "area_km2": 15582,
+   "sun": 1541.0,
+   "rain": 704.0,
+   "sun6190": 1399.0,
+   "rain6190": 669.0,
+   "sun_chg_pct": 10.1,
+   "rain_chg_pct": 5.2,
+   "sun_chg_h": 142.0,
+   "share_sunnier": 1.0,
+   "share_wetter": 0.995
+  },
+  {
+   "level": "region",
+   "name": "West Midlands",
+   "area_km2": 12962,
+   "sun": 1484.0,
+   "rain": 772.0,
+   "sun6190": 1373.0,
+   "rain6190": 730.0,
+   "sun_chg_pct": 8.1,
+   "rain_chg_pct": 5.8,
+   "sun_chg_h": 111.0,
+   "share_sunnier": 1.0,
+   "share_wetter": 0.988
+  },
+  {
+   "level": "region",
+   "name": "East of England",
+   "area_km2": 19180,
+   "sun": 1617.0,
+   "rain": 627.0,
+   "sun6190": 1498.0,
+   "rain6190": 597.0,
+   "sun_chg_pct": 8.0,
+   "rain_chg_pct": 4.9,
+   "sun_chg_h": 120.0,
+   "share_sunnier": 1.0,
+   "share_wetter": 0.989
+  },
+  {
+   "level": "region",
+   "name": "London",
+   "area_km2": 1577,
+   "sun": 1605.0,
+   "rain": 650.0,
+   "sun6190": 1475.0,
+   "rain6190": 632.0,
+   "sun_chg_pct": 8.8,
+   "rain_chg_pct": 2.9,
+   "sun_chg_h": 130.0,
+   "share_sunnier": 1.0,
+   "share_wetter": 0.971
+  },
+  {
+   "level": "region",
+   "name": "South East",
+   "area_km2": 19147,
+   "sun": 1667.0,
+   "rain": 786.0,
+   "sun6190": 1554.0,
+   "rain6190": 742.0,
+   "sun_chg_pct": 7.3,
+   "rain_chg_pct": 5.9,
+   "sun_chg_h": 113.0,
+   "share_sunnier": 0.99,
+   "share_wetter": 0.987
+  },
+  {
+   "level": "region",
+   "name": "South West",
+   "area_km2": 23895,
+   "sun": 1594.0,
+   "rain": 1056.0,
+   "sun6190": 1525.0,
+   "rain6190": 986.0,
+   "sun_chg_pct": 4.5,
+   "rain_chg_pct": 7.2,
+   "sun_chg_h": 69.0,
+   "share_sunnier": 0.918,
+   "share_wetter": 0.989
+  }
+ ],
+ "region_rank": {
+  "sun": [
+   "South East",
+   "East of England",
+   "London",
+   "South West",
+   "East Midlands",
+   "West Midlands",
+   "North East",
+   "Yorkshire and the Humber",
+   "North West"
+  ],
+  "sun_chg": [
+   "North East",
+   "East Midlands",
+   "Yorkshire and the Humber",
+   "London",
+   "West Midlands",
+   "East of England",
+   "South East",
+   "North West",
+   "South West"
+  ]
+ },
+ "nation": {
+  "England": {
+   "area_km2": 130576,
+   "sun": 1539.0,
+   "rain": 869.0,
+   "sun6190": 1431.0,
+   "rain6190": 820.0,
+   "sun_chg_pct": 7.5,
+   "rain_chg_pct": 6.0,
+   "sun_chg_h": 108.0,
+   "share_sunnier": 0.983,
+   "share_wetter": 0.985
+  },
+  "Scotland": {
+   "area_km2": 79362,
+   "sun": 1203.0,
+   "rain": 1569.0,
+   "sun6190": 1168.0,
+   "rain6190": 1442.0,
+   "sun_chg_pct": 3.0,
+   "rain_chg_pct": 8.8,
+   "sun_chg_h": 35.0,
+   "share_sunnier": 0.833,
+   "share_wetter": 0.986
+  },
+  "Wales": {
+   "area_km2": 20813,
+   "sun": 1409.0,
+   "rain": 1459.0,
+   "sun6190": 1353.0,
+   "rain6190": 1375.0,
+   "sun_chg_pct": 4.1,
+   "rain_chg_pct": 6.2,
+   "sun_chg_h": 55.0,
+   "share_sunnier": 0.928,
+   "share_wetter": 0.974
+  },
+  "Northern Ireland": {
+   "area_km2": 14326,
+   "sun": 1259.0,
+   "rain": 1153.0,
+   "sun6190": 1237.0,
+   "rain6190": 1087.0,
+   "sun_chg_pct": 1.8,
+   "rain_chg_pct": 6.1,
+   "sun_chg_h": 23.0,
+   "share_sunnier": 0.764,
+   "share_wetter": 0.992
+  }
+ },
+ "breaks": {
+  "sun3": [
+   1310.0,
+   1526.0
+  ],
+  "rain3": [
+   817.0,
+   1231.0
+  ],
+  "sun4": [
+   1256.0,
+   1428.0,
+   1564.0
+  ],
+  "rain4": [
+   739.0,
+   986.0,
+   1397.0
+  ]
+ },
+ "classes": {
+  "share": [
+   [
+    0.002,
+    0.121,
+    0.21
+   ],
+   [
+    0.09,
+    0.138,
+    0.105
+   ],
+   [
+    0.24,
+    0.074,
+    0.019
+   ]
+  ],
+  "note": "share[rain class][sun class], 0 = lowest",
+  "sunny_dry": {
+   "share": 0.21,
+   "km2": 51389,
+   "top_regions": [
+    {
+     "region": "East of England",
+     "share": 0.344
+    },
+    {
+     "region": "South East",
+     "share": 0.211
+    },
+    {
+     "region": "East Midlands",
+     "share": 0.184
+    },
+    {
+     "region": "South West",
+     "share": 0.072
+    }
+   ]
+  },
+  "sunny_wet": {
+   "share": 0.019,
+   "km2": 4651,
+   "top_regions": [
+    {
+     "region": "South West",
+     "share": 0.664
+    },
+    {
+     "region": "Wales",
+     "share": 0.284
+    },
+    {
+     "region": "Scotland",
+     "share": 0.047
+    },
+    {
+     "region": "North West",
+     "share": 0.005
+    }
+   ],
+   "top_counties": [
+    {
+     "county": "Cornwall",
+     "share": 0.369
+    },
+    {
+     "county": "Devon",
+     "share": 0.272
+    },
+    {
+     "county": "Carmarthenshire",
+     "share": 0.076
+    },
+    {
+     "county": "Pembrokeshire",
+     "share": 0.071
+    },
+    {
+     "county": "Dumfries and Galloway",
+     "share": 0.044
+    }
+   ]
+  },
+  "dull_dry": {
+   "share": 0.002,
+   "km2": 608,
+   "top_regions": [
+    {
+     "region": "Scotland",
+     "share": 0.959
+    },
+    {
+     "region": "Northern Ireland",
+     "share": 0.035
+    },
+    {
+     "region": "North West",
+     "share": 0.007
+    }
+   ],
+   "top_counties": [
+    {
+     "county": "Highland",
+     "share": 0.773
+    },
+    {
+     "county": "Moray",
+     "share": 0.12
+    },
+    {
+     "county": "Northern Ireland",
+     "share": 0.035
+    },
+    {
+     "county": "Aberdeenshire",
+     "share": 0.035
+    },
+    {
+     "county": "Midlothian",
+     "share": 0.015
+    }
+   ]
+  },
+  "dull_wet": {
+   "share": 0.24,
+   "km2": 58762,
+   "top_regions": [
+    {
+     "region": "Scotland",
+     "share": 0.75
+    },
+    {
+     "region": "Wales",
+     "share": 0.088
+    },
+    {
+     "region": "Northern Ireland",
+     "share": 0.073
+    },
+    {
+     "region": "North West",
+     "share": 0.047
+    }
+   ]
+  },
+  "middle": {
+   "share": 0.138,
+   "km2": 33747,
+   "top_regions": [
+    {
+     "region": "Scotland",
+     "share": 0.301
+    },
+    {
+     "region": "North West",
+     "share": 0.161
+    },
+    {
+     "region": "Northern Ireland",
+     "share": 0.104
+    },
+    {
+     "region": "Wales",
+     "share": 0.101
+    }
+   ]
+  }
+ },
+ "palette": {
+  "3": [
+   [
+    "#F4F0E6",
+    "#FAC08A",
+    "#F0902A"
+   ],
+   [
+    "#99BDBD",
+    "#A0887D",
+    "#975241"
+   ],
+   [
+    "#2E8C96",
+    "#43546D",
+    "#3E1C47"
+   ]
+  ],
+  "4": [
+   [
+    "#F4F0E6",
+    "#FAD0A8",
+    "#F8B06C",
+    "#F0902A"
+   ],
+   [
+    "#B8CECB",
+    "#BEAB99",
+    "#BC896A",
+    "#B4663D"
+   ],
+   [
+    "#7AADB0",
+    "#82888A",
+    "#816466",
+    "#7A3F44"
+   ],
+   [
+    "#2E8C96",
+    "#40667B",
+    "#434260",
+    "#3E1C47"
+   ]
+  ],
+  "corners": {
+   "dull_dry": "#F4F0E6",
+   "sunny_dry": "#F0902A",
+   "dull_wet": "#2E8C96",
+   "sunny_wet": "#3E1C47"
+  }
+ },
+ "towns_n": 803,
+ "towns_pop": 55514590,
+ "os_towns_n": 1426,
+ "town_classes": {
+  "sunny_dry": {
+   "n": 339,
+   "pop_share": 0.487,
+   "biggest": [
+    {
+     "name": "London",
+     "pop": 8961989,
+     "sun": 1559,
+     "rain": 618
+    },
+    {
+     "name": "Islington",
+     "pop": 319143,
+     "sun": 1561,
+     "rain": 629
+    },
+    {
+     "name": "Reading",
+     "pop": 318014,
+     "sun": 1578,
+     "rain": 650
+    },
+    {
+     "name": "Kingston upon Hull",
+     "pop": 314018,
+     "sun": 1582,
+     "rain": 683
+    },
+    {
+     "name": "Southend-on-Sea",
+     "pop": 295310,
+     "sun": 1780,
+     "rain": 526
+    },
+    {
+     "name": "Brighton",
+     "pop": 283870,
+     "sun": 1764,
+     "rain": 782
+    }
+   ]
+  },
+  "sunny_wet": {
+   "n": 10,
+   "pop_share": 0.011,
+   "biggest": [
+    {
+     "name": "Swansea",
+     "pop": 300352,
+     "sun": 1555,
+     "rain": 1262
+    },
+    {
+     "name": "Bridgend",
+     "pop": 49597,
+     "sun": 1570,
+     "rain": 1247
+    },
+    {
+     "name": "Cwmbran",
+     "pop": 48535,
+     "sun": 1532,
+     "rain": 1388
+    },
+    {
+     "name": "Redruth",
+     "pop": 42690,
+     "sun": 1611,
+     "rain": 1273
+    },
+    {
+     "name": "Coity",
+     "pop": 41352,
+     "sun": 1526,
+     "rain": 1390
+    },
+    {
+     "name": "Caerphilly",
+     "pop": 31060,
+     "sun": 1538,
+     "rain": 1457
+    }
+   ]
+  },
+  "dull_dry": {
+   "n": 1,
+   "pop_share": 0.001,
+   "biggest": [
+    {
+     "name": "Inverness",
+     "pop": 47790,
+     "sun": 1245,
+     "rain": 747
+    }
+   ]
+  },
+  "dull_wet": {
+   "n": 10,
+   "pop_share": 0.007,
+   "biggest": [
+    {
+     "name": "Rochdale",
+     "pop": 97550,
+     "sun": 1287,
+     "rain": 1273
+    },
+    {
+     "name": "Rossendale",
+     "pop": 67400,
+     "sun": 1299,
+     "rain": 1485
+    },
+    {
+     "name": "Cumbernauld",
+     "pop": 50530,
+     "sun": 1287,
+     "rain": 1360
+    },
+    {
+     "name": "Greenock",
+     "pop": 41280,
+     "sun": 1295,
+     "rain": 1622
+    },
+    {
+     "name": "Saddleworth",
+     "pop": 25441,
+     "sun": 1295,
+     "rain": 1281
+    },
+    {
+     "name": "Vale of Leven",
+     "pop": 24640,
+     "sun": 1305,
+     "rain": 1463
+    }
+   ]
+  },
+  "middle": {
+   "n": 139,
+   "pop_share": 0.146,
+   "biggest": [
+    {
+     "name": "Glasgow",
+     "pop": 626410,
+     "sun": 1318,
+     "rain": 1045
+    },
+    {
+     "name": "Manchester",
+     "pop": 568996,
+     "sun": 1370,
+     "rain": 907
+    },
+    {
+     "name": "Liverpool",
+     "pop": 496770,
+     "sun": 1477,
+     "rain": 873
+    },
+    {
+     "name": "Bradford",
+     "pop": 366187,
+     "sun": 1326,
+     "rain": 876
+    },
+    {
+     "name": "Preston",
+     "pop": 313332,
+     "sun": 1407,
+     "rain": 1053
+    },
+    {
+     "name": "Stoke-on-Trent",
+     "pop": 258366,
+     "sun": 1403,
+     "rain": 861
+    }
+   ]
+  },
+  "land_vs_people": "share of land vs share of people in towns of 15,000+"
+ },
+ "towns": {
+  "sunniest": [
+   {
+    "name": "Folkestone",
+    "region": "South East",
+    "pop": 66429,
+    "sun": 1937,
+    "rain": 796,
+    "sun6190": 1756,
+    "rain6190": 733,
+    "sun_chg_pct": 10.3
+   },
+   {
+    "name": "Sandown",
+    "region": "South East",
+    "pop": 20155,
+    "sun": 1928,
+    "rain": 896,
+    "sun6190": 1823,
+    "rain6190": 821,
+    "sun_chg_pct": 5.8
+   },
+   {
+    "name": "Dover",
+    "region": "South East",
+    "pop": 41709,
+    "sun": 1918,
+    "rain": 851,
+    "sun6190": 1713,
+    "rain6190": 801,
+    "sun_chg_pct": 12.0
+   },
+   {
+    "name": "Hastings",
+    "region": "South East",
+    "pop": 92855,
+    "sun": 1905,
+    "rain": 779,
+    "sun6190": 1724,
+    "rain6190": 744,
+    "sun_chg_pct": 10.5
+   },
+   {
+    "name": "Deal",
+    "region": "South East",
+    "pop": 30917,
+    "sun": 1903,
+    "rain": 715,
+    "sun6190": 1709,
+    "rain6190": 672,
+    "sun_chg_pct": 11.4
+   },
+   {
+    "name": "Bognor Regis",
+    "region": "South East",
+    "pop": 63885,
+    "sun": 1898,
+    "rain": 744,
+    "sun6190": 1840,
+    "rain6190": 720,
+    "sun_chg_pct": 3.1
+   },
+   {
+    "name": "Weymouth",
+    "region": "South West",
+    "pop": 53416,
+    "sun": 1889,
+    "rain": 820,
+    "sun6190": 1752,
+    "rain6190": 756,
+    "sun_chg_pct": 7.8
+   },
+   {
+    "name": "Christchurch",
+    "region": "South West",
+    "pop": 31372,
+    "sun": 1875,
+    "rain": 805,
+    "sun6190": 1768,
+    "rain6190": 729,
+    "sun_chg_pct": 6.0
+   },
+   {
+    "name": "Herne Bay",
+    "region": "South East",
+    "pop": 24875,
+    "sun": 1869,
+    "rain": 571,
+    "sun6190": 1672,
+    "rain6190": 558,
+    "sun_chg_pct": 11.8
+   },
+   {
+    "name": "Broadstairs",
+    "region": "South East",
+    "pop": 23283,
+    "sun": 1868,
+    "rain": 624,
+    "sun6190": 1672,
+    "rain6190": 602,
+    "sun_chg_pct": 11.8
+   }
+  ],
+  "dullest": [
+   {
+    "name": "Fort William",
+    "region": "Scotland",
+    "pop": 15757,
+    "sun": 927,
+    "rain": 2405,
+    "sun6190": 912,
+    "rain6190": 2116,
+    "sun_chg_pct": 1.6
+   },
+   {
+    "name": "Derry",
+    "region": "Northern Ireland",
+    "pop": 83652,
+    "sun": 1168,
+    "rain": 1126,
+    "sun6190": 1166,
+    "rain6190": 1033,
+    "sun_chg_pct": 0.1
+   },
+   {
+    "name": "Omagh",
+    "region": "Northern Ireland",
+    "pop": 21056,
+    "sun": 1181,
+    "rain": 1133,
+    "sun6190": 1170,
+    "rain6190": 1037,
+    "sun_chg_pct": 0.9
+   },
+   {
+    "name": "Coleraine",
+    "region": "Northern Ireland",
+    "pop": 25681,
+    "sun": 1210,
+    "rain": 1045,
+    "sun6190": 1198,
+    "rain6190": 976,
+    "sun_chg_pct": 1.0
+   },
+   {
+    "name": "Isle of Lewis",
+    "region": "Scotland",
+    "pop": 18500,
+    "sun": 1212,
+    "rain": 1348,
+    "sun6190": 1188,
+    "rain6190": 1246,
+    "sun_chg_pct": 2.1
+   },
+   {
+    "name": "Inverness",
+    "region": "Scotland",
+    "pop": 47790,
+    "sun": 1245,
+    "rain": 747,
+    "sun6190": 1191,
+    "rain6190": 659,
+    "sun_chg_pct": 4.6
+   },
+   {
+    "name": "Ballymena",
+    "region": "Northern Ireland",
+    "pop": 28932,
+    "sun": 1252,
+    "rain": 1072,
+    "sun6190": 1264,
+    "rain6190": 1013,
+    "sun_chg_pct": -0.9
+   },
+   {
+    "name": "Nelson",
+    "region": "North West",
+    "pop": 29317,
+    "sun": 1264,
+    "rain": 1193,
+    "sun6190": 1188,
+    "rain6190": 1175,
+    "sun_chg_pct": 6.4
+   },
+   {
+    "name": "Burnley",
+    "region": "North West",
+    "pop": 149422,
+    "sun": 1264,
+    "rain": 1155,
+    "sun6190": 1194,
+    "rain6190": 1130,
+    "sun_chg_pct": 5.9
+   },
+   {
+    "name": "Belfast",
+    "region": "Northern Ireland",
+    "pop": 348005,
+    "sun": 1271,
+    "rain": 982,
+    "sun6190": 1270,
+    "rain6190": 934,
+    "sun_chg_pct": 0.1
+   }
+  ],
+  "wettest": [
+   {
+    "name": "Fort William",
+    "region": "Scotland",
+    "pop": 15757,
+    "sun": 927,
+    "rain": 2405,
+    "sun6190": 912,
+    "rain6190": 2116,
+    "sun_chg_pct": 1.6
+   },
+   {
+    "name": "Rhondda",
+    "region": "Wales",
+    "pop": 69506,
+    "sun": 1426,
+    "rain": 2271,
+    "sun6190": 1331,
+    "rain6190": 2076,
+    "sun_chg_pct": 7.2
+   },
+   {
+    "name": "Tonypandy",
+    "region": "Wales",
+    "pop": 62545,
+    "sun": 1460,
+    "rain": 2125,
+    "sun6190": 1360,
+    "rain6190": 1950,
+    "sun_chg_pct": 7.3
+   },
+   {
+    "name": "Maesteg",
+    "region": "Wales",
+    "pop": 21001,
+    "sun": 1440,
+    "rain": 1968,
+    "sun6190": 1350,
+    "rain6190": 1833,
+    "sun_chg_pct": 6.6
+   },
+   {
+    "name": "Aberdare",
+    "region": "Wales",
+    "pop": 31135,
+    "sun": 1381,
+    "rain": 1937,
+    "sun6190": 1292,
+    "rain6190": 1782,
+    "sun_chg_pct": 6.9
+   },
+   {
+    "name": "Pontypridd",
+    "region": "Wales",
+    "pop": 31206,
+    "sun": 1497,
+    "rain": 1742,
+    "sun6190": 1394,
+    "rain6190": 1573,
+    "sun_chg_pct": 7.3
+   },
+   {
+    "name": "Greenock",
+    "region": "Scotland",
+    "pop": 41280,
+    "sun": 1295,
+    "rain": 1622,
+    "sun6190": 1224,
+    "rain6190": 1519,
+    "sun_chg_pct": 5.8
+   },
+   {
+    "name": "Gelligaer",
+    "region": "Wales",
+    "pop": 17376,
+    "sun": 1432,
+    "rain": 1608,
+    "sun6190": 1341,
+    "rain6190": 1443,
+    "sun_chg_pct": 6.8
+   },
+   {
+    "name": "Ebbw Vale",
+    "region": "Wales",
+    "pop": 33068,
+    "sun": 1375,
+    "rain": 1550,
+    "sun6190": 1312,
+    "rain6190": 1460,
+    "sun_chg_pct": 4.9
+   },
+   {
+    "name": "Pontypool",
+    "region": "Wales",
+    "pop": 35686,
+    "sun": 1499,
+    "rain": 1541,
+    "sun6190": 1370,
+    "rain6190": 1379,
+    "sun_chg_pct": 9.4
+   }
+  ],
+  "driest": [
+   {
+    "name": "Southend-on-Sea",
+    "region": "East of England",
+    "pop": 295310,
+    "sun": 1780,
+    "rain": 526,
+    "sun6190": 1567,
+    "rain6190": 522,
+    "sun_chg_pct": 13.6
+   },
+   {
+    "name": "Rochford",
+    "region": "East of England",
+    "pop": 16739,
+    "sun": 1755,
+    "rain": 530,
+    "sun6190": 1541,
+    "rain6190": 513,
+    "sun_chg_pct": 13.9
+   },
+   {
+    "name": "Canvey Island",
+    "region": "East of England",
+    "pop": 38170,
+    "sun": 1754,
+    "rain": 533,
+    "sun6190": 1541,
+    "rain6190": 522,
+    "sun_chg_pct": 13.8
+   },
+   {
+    "name": "Grays",
+    "region": "East of England",
+    "pop": 89755,
+    "sun": 1665,
+    "rain": 540,
+    "sun6190": 1489,
+    "rain6190": 517,
+    "sun_chg_pct": 11.8
+   },
+   {
+    "name": "South Benfleet",
+    "region": "East of England",
+    "pop": 48824,
+    "sun": 1728,
+    "rain": 540,
+    "sun6190": 1515,
+    "rain6190": 521,
+    "sun_chg_pct": 14.1
+   },
+   {
+    "name": "Walton-on-the-Naze",
+    "region": "East of England",
+    "pop": 17458,
+    "sun": 1821,
+    "rain": 550,
+    "sun6190": 1651,
+    "rain6190": 533,
+    "sun_chg_pct": 10.3
+   },
+   {
+    "name": "Bedford",
+    "region": "East of England",
+    "pop": 106940,
+    "sun": 1566,
+    "rain": 555,
+    "sun6190": 1438,
+    "rain6190": 533,
+    "sun_chg_pct": 8.9
+   },
+   {
+    "name": "Gravesend",
+    "region": "South East",
+    "pop": 54263,
+    "sun": 1679,
+    "rain": 555,
+    "sun6190": 1502,
+    "rain6190": 534,
+    "sun_chg_pct": 11.8
+   },
+   {
+    "name": "Clacton-on-Sea",
+    "region": "East of England",
+    "pop": 50548,
+    "sun": 1808,
+    "rain": 556,
+    "sun6190": 1624,
+    "rain6190": 538,
+    "sun_chg_pct": 11.3
+   },
+   {
+    "name": "Thamesmead",
+    "region": "London",
+    "pop": 31824,
+    "sun": 1577,
+    "rain": 558,
+    "sun6190": 1440,
+    "rain6190": 530,
+    "sun_chg_pct": 9.5
+   }
+  ],
+  "gained": [
+   {
+    "name": "Ashington",
+    "region": "North East",
+    "pop": 27670,
+    "sun": 1603,
+    "rain": 659,
+    "sun6190": 1359,
+    "rain6190": 640,
+    "sun_chg_pct": 18.0
+   },
+   {
+    "name": "Blyth",
+    "region": "North East",
+    "pop": 37339,
+    "sun": 1632,
+    "rain": 655,
+    "sun6190": 1389,
+    "rain6190": 627,
+    "sun_chg_pct": 17.5
+   },
+   {
+    "name": "Bedlington",
+    "region": "North East",
+    "pop": 18470,
+    "sun": 1569,
+    "rain": 662,
+    "sun6190": 1336,
+    "rain6190": 638,
+    "sun_chg_pct": 17.5
+   },
+   {
+    "name": "Whitley Bay",
+    "region": "North East",
+    "pop": 38055,
+    "sun": 1609,
+    "rain": 657,
+    "sun6190": 1376,
+    "rain6190": 636,
+    "sun_chg_pct": 17.0
+   },
+   {
+    "name": "Tynemouth",
+    "region": "North East",
+    "pop": 60605,
+    "sun": 1598,
+    "rain": 665,
+    "sun6190": 1369,
+    "rain6190": 638,
+    "sun_chg_pct": 16.8
+   },
+   {
+    "name": "North Shields",
+    "region": "North East",
+    "pop": 39747,
+    "sun": 1591,
+    "rain": 670,
+    "sun6190": 1362,
+    "rain6190": 643,
+    "sun_chg_pct": 16.7
+   },
+   {
+    "name": "Cramlington",
+    "region": "North East",
+    "pop": 33180,
+    "sun": 1555,
+    "rain": 685,
+    "sun6190": 1332,
+    "rain6190": 657,
+    "sun_chg_pct": 16.7
+   },
+   {
+    "name": "South Shields",
+    "region": "North East",
+    "pop": 83655,
+    "sun": 1587,
+    "rain": 638,
+    "sun6190": 1362,
+    "rain6190": 611,
+    "sun_chg_pct": 16.5
+   },
+   {
+    "name": "Rotherham",
+    "region": "Yorkshire and the Humber",
+    "pop": 117618,
+    "sun": 1520,
+    "rain": 661,
+    "sun6190": 1314,
+    "rain6190": 643,
+    "sun_chg_pct": 15.7
+   },
+   {
+    "name": "Jarrow",
+    "region": "North East",
+    "pop": 29470,
+    "sun": 1543,
+    "rain": 642,
+    "sun6190": 1335,
+    "rain6190": 614,
+    "sun_chg_pct": 15.6
+   }
+  ],
+  "lost": [
+   {
+    "name": "Dumfries",
+    "region": "Scotland",
+    "pop": 46500,
+    "sun": 1288,
+    "rain": 1225,
+    "sun6190": 1328,
+    "rain6190": 1075,
+    "sun_chg_pct": -3.0
+   },
+   {
+    "name": "South Hayling",
+    "region": "South East",
+    "pop": 15485,
+    "sun": 1750,
+    "rain": 737,
+    "sun6190": 1798,
+    "rain6190": 680,
+    "sun_chg_pct": -2.7
+   },
+   {
+    "name": "Hayling Island",
+    "region": "South East",
+    "pop": 16887,
+    "sun": 1756,
+    "rain": 734,
+    "sun6190": 1805,
+    "rain6190": 677,
+    "sun_chg_pct": -2.7
+   },
+   {
+    "name": "Havant",
+    "region": "South East",
+    "pop": 45574,
+    "sun": 1649,
+    "rain": 786,
+    "sun6190": 1682,
+    "rain6190": 733,
+    "sun_chg_pct": -1.9
+   },
+   {
+    "name": "Emsworth",
+    "region": "South East",
+    "pop": 18777,
+    "sun": 1663,
+    "rain": 822,
+    "sun6190": 1693,
+    "rain6190": 754,
+    "sun_chg_pct": -1.7
+   }
+  ],
+  "share_sunnier": 0.981,
+  "cities250k": [
+   {
+    "name": "Southend-on-Sea",
+    "region": "East of England",
+    "pop": 295310,
+    "sun": 1780,
+    "rain": 526,
+    "sun6190": 1567,
+    "rain6190": 522,
+    "sun_chg_pct": 13.6
+   },
+   {
+    "name": "Brighton",
+    "region": "South East",
+    "pop": 283870,
+    "sun": 1764,
+    "rain": 782,
+    "sun6190": 1711,
+    "rain6190": 749,
+    "sun_chg_pct": 3.0
+   },
+   {
+    "name": "Southampton",
+    "region": "South East",
+    "pop": 269781,
+    "sun": 1684,
+    "rain": 842,
+    "sun6190": 1636,
+    "rain6190": 763,
+    "sun_chg_pct": 2.9
+   },
+   {
+    "name": "Plymouth",
+    "region": "South West",
+    "pop": 260203,
+    "sun": 1649,
+    "rain": 1036,
+    "sun6190": 1642,
+    "rain6190": 972,
+    "sun_chg_pct": 0.4
+   },
+   {
+    "name": "Cardiff",
+    "region": "Wales",
+    "pop": 372089,
+    "sun": 1620,
+    "rain": 1166,
+    "sun6190": 1495,
+    "rain6190": 1036,
+    "sun_chg_pct": 8.3
+   },
+   {
+    "name": "Bristol",
+    "region": "South West",
+    "pop": 479024,
+    "sun": 1611,
+    "rain": 883,
+    "sun6190": 1491,
+    "rain6190": 818,
+    "sun_chg_pct": 8.1
+   },
+   {
+    "name": "Kingston upon Hull",
+    "region": "Yorkshire and the Humber",
+    "pop": 314018,
+    "sun": 1582,
+    "rain": 683,
+    "sun6190": 1443,
+    "rain6190": 648,
+    "sun_chg_pct": 9.6
+   },
+   {
+    "name": "Reading",
+    "region": "South East",
+    "pop": 318014,
+    "sun": 1578,
+    "rain": 650,
+    "sun6190": 1514,
+    "rain6190": 634,
+    "sun_chg_pct": 4.3
+   },
+   {
+    "name": "Islington",
+    "region": "London",
+    "pop": 319143,
+    "sun": 1561,
+    "rain": 629,
+    "sun6190": 1454,
+    "rain6190": 612,
+    "sun_chg_pct": 7.3
+   },
+   {
+    "name": "London",
+    "region": "London",
+    "pop": 8961989,
+    "sun": 1559,
+    "rain": 618,
+    "sun6190": 1448,
+    "rain6190": 609,
+    "sun_chg_pct": 7.6
+   },
+   {
+    "name": "Swansea",
+    "region": "Wales",
+    "pop": 300352,
+    "sun": 1555,
+    "rain": 1262,
+    "sun6190": 1490,
+    "rain6190": 1265,
+    "sun_chg_pct": 4.4
+   },
+   {
+    "name": "Coventry",
+    "region": "West Midlands",
+    "pop": 345324,
+    "sun": 1519,
+    "rain": 675,
+    "sun6190": 1376,
+    "rain6190": 640,
+    "sun_chg_pct": 10.4
+   },
+   {
+    "name": "Milton Keynes",
+    "region": "South East",
+    "pop": 256385,
+    "sun": 1506,
+    "rain": 655,
+    "sun6190": 1366,
+    "rain6190": 628,
+    "sun_chg_pct": 10.2
+   },
+   {
+    "name": "Sheffield",
+    "region": "Yorkshire and the Humber",
+    "pop": 556500,
+    "sun": 1506,
+    "rain": 768,
+    "sun6190": 1311,
+    "rain6190": 750,
+    "sun_chg_pct": 14.8
+   },
+   {
+    "name": "Birkenhead",
+    "region": "North West",
+    "pop": 325264,
+    "sun": 1496,
+    "rain": 786,
+    "sun6190": 1410,
+    "rain6190": 749,
+    "sun_chg_pct": 6.1
+   },
+   {
+    "name": "Newcastle upon Tyne",
+    "region": "North East",
+    "pop": 300125,
+    "sun": 1488,
+    "rain": 678,
+    "sun6190": 1310,
+    "rain6190": 640,
+    "sun_chg_pct": 13.6
+   },
+   {
+    "name": "Nottingham",
+    "region": "East Midlands",
+    "pop": 323632,
+    "sun": 1480,
+    "rain": 638,
+    "sun6190": 1316,
+    "rain6190": 609,
+    "sun_chg_pct": 12.5
+   },
+   {
+    "name": "Liverpool",
+    "region": "North West",
+    "pop": 496770,
+    "sun": 1477,
+    "rain": 873,
+    "sun6190": 1396,
+    "rain6190": 822,
+    "sun_chg_pct": 5.8
+   },
+   {
+    "name": "Birmingham",
+    "region": "West Midlands",
+    "pop": 1157603,
+    "sun": 1475,
+    "rain": 750,
+    "sun6190": 1369,
+    "rain6190": 710,
+    "sun_chg_pct": 7.8
+   },
+   {
+    "name": "Derby",
+    "region": "East Midlands",
+    "pop": 270468,
+    "sun": 1464,
+    "rain": 699,
+    "sun6190": 1321,
+    "rain6190": 671,
+    "sun_chg_pct": 10.8
+   },
+   {
+    "name": "Leicester",
+    "region": "East Midlands",
+    "pop": 368600,
+    "sun": 1456,
+    "rain": 657,
+    "sun6190": 1286,
+    "rain6190": 618,
+    "sun_chg_pct": 13.2
+   },
+   {
+    "name": "Wolverhampton",
+    "region": "West Midlands",
+    "pop": 263700,
+    "sun": 1433,
+    "rain": 762,
+    "sun6190": 1331,
+    "rain6190": 712,
+    "sun_chg_pct": 7.7
+   },
+   {
+    "name": "Edinburgh",
+    "region": "Scotland",
+    "pop": 514990,
+    "sun": 1426,
+    "rain": 737,
+    "sun6190": 1348,
+    "rain6190": 652,
+    "sun_chg_pct": 5.8
+   },
+   {
+    "name": "Preston",
+    "region": "North West",
+    "pop": 313332,
+    "sun": 1407,
+    "rain": 1053,
+    "sun6190": 1345,
+    "rain6190": 999,
+    "sun_chg_pct": 4.7
+   },
+   {
+    "name": "Stoke-on-Trent",
+    "region": "West Midlands",
+    "pop": 258366,
+    "sun": 1403,
+    "rain": 861,
+    "sun6190": 1237,
+    "rain6190": 811,
+    "sun_chg_pct": 13.5
+   },
+   {
+    "name": "Manchester",
+    "region": "North West",
+    "pop": 568996,
+    "sun": 1370,
+    "rain": 907,
+    "sun6190": 1295,
+    "rain6190": 877,
+    "sun_chg_pct": 5.8
+   },
+   {
+    "name": "Leeds",
+    "region": "Yorkshire and the Humber",
+    "pop": 536280,
+    "sun": 1342,
+    "rain": 660,
+    "sun6190": 1253,
+    "rain6190": 660,
+    "sun_chg_pct": 7.1
+   },
+   {
+    "name": "Bradford",
+    "region": "Yorkshire and the Humber",
+    "pop": 366187,
+    "sun": 1326,
+    "rain": 876,
+    "sun6190": 1228,
+    "rain6190": 842,
+    "sun_chg_pct": 8.0
+   },
+   {
+    "name": "Glasgow",
+    "region": "Scotland",
+    "pop": 626410,
+    "sun": 1318,
+    "rain": 1045,
+    "sun6190": 1243,
+    "rain6190": 960,
+    "sun_chg_pct": 6.0
+   },
+   {
+    "name": "Belfast",
+    "region": "Northern Ireland",
+    "pop": 348005,
+    "sun": 1271,
+    "rain": 982,
+    "sun6190": 1270,
+    "rain6190": 934,
+    "sun_chg_pct": 0.1
+   }
+  ]
+ },
+ "town_lookup": {
+  "London": {
+   "sun": 1559,
+   "rain": 618,
+   "sun6190": 1448,
+   "rain6190": 609,
+   "sun_chg_pct": 7.6,
+   "class": [
+    0,
+    2
+   ],
+   "sun_m": [
+    52,
+    72,
+    117,
+    165,
+    196,
+    192,
+    202,
+    195,
+    148,
+    108,
+    63,
+    48
+   ],
+   "rain_m": [
+    58,
+    44,
+    37,
+    42,
+    45,
+    53,
+    44,
+    54,
+    50,
+    67,
+    65,
+    59
+   ],
+   "tmax_m": [
+    8.6,
+    9.1,
+    11.7,
+    15.0,
+    18.4,
+    21.4,
+    23.6,
+    23.2,
+    20.1,
+    15.8,
+    11.5,
+    8.9
+   ]
+  },
+  "Manchester": {
+   "sun": 1370,
+   "rain": 907,
+   "sun6190": 1295,
+   "rain6190": 877,
+   "sun_chg_pct": 5.8,
+   "class": [
+    1,
+    1
+   ],
+   "sun_m": [
+    44,
+    66,
+    105,
+    151,
+    184,
+    169,
+    176,
+    157,
+    128,
+    92,
+    56,
+    45
+   ],
+   "rain_m": [
+    78,
+    67,
+    61,
+    56,
+    59,
+    72,
+    81,
+    80,
+    78,
+    92,
+    86,
+    96
+   ],
+   "tmax_m": [
+    7.9,
+    8.9,
+    10.8,
+    13.6,
+    16.7,
+    19.4,
+    21.0,
+    20.7,
+    18.0,
+    14.6,
+    10.6,
+    8.3
+   ]
+  },
+  "Glasgow": {
+   "sun": 1318,
+   "rain": 1045,
+   "sun6190": 1243,
+   "rain6190": 960,
+   "sun_chg_pct": 6.0,
+   "class": [
+    1,
+    1
+   ],
+   "sun_m": [
+    40,
+    69,
+    102,
+    147,
+    193,
+    160,
+    160,
+    150,
+    118,
+    88,
+    55,
+    36
+   ],
+   "rain_m": [
+    112,
+    91,
+    76,
+    57,
+    64,
+    67,
+    78,
+    84,
+    87,
+    110,
+    104,
+    115
+   ],
+   "tmax_m": [
+    7.4,
+    8.1,
+    9.7,
+    12.6,
+    15.6,
+    18.1,
+    19.5,
+    19.1,
+    16.8,
+    13.3,
+    9.8,
+    7.6
+   ]
+  },
+  "Cardiff": {
+   "sun": 1620,
+   "rain": 1166,
+   "sun6190": 1495,
+   "rain6190": 1036,
+   "sun_chg_pct": 8.3,
+   "class": [
+    1,
+    2
+   ],
+   "sun_m": [
+    53,
+    78,
+    126,
+    173,
+    206,
+    208,
+    212,
+    189,
+    154,
+    106,
+    65,
+    50
+   ],
+   "rain_m": [
+    123,
+    88,
+    82,
+    70,
+    76,
+    74,
+    84,
+    100,
+    82,
+    124,
+    126,
+    135
+   ],
+   "tmax_m": [
+    8.6,
+    9.0,
+    11.2,
+    14.3,
+    17.2,
+    19.8,
+    21.6,
+    21.2,
+    19.0,
+    15.1,
+    11.6,
+    9.1
+   ]
+  },
+  "Belfast": {
+   "sun": 1271,
+   "rain": 982,
+   "sun6190": 1270,
+   "rain6190": 934,
+   "sun_chg_pct": 0.1,
+   "class": [
+    1,
+    0
+   ],
+   "sun_m": [
+    41,
+    65,
+    100,
+    144,
+    185,
+    155,
+    147,
+    143,
+    113,
+    85,
+    54,
+    37
+   ],
+   "rain_m": [
+    94,
+    74,
+    77,
+    62,
+    62,
+    71,
+    76,
+    85,
+    73,
+    98,
+    107,
+    102
+   ],
+   "tmax_m": [
+    8.1,
+    8.7,
+    10.6,
+    13.0,
+    16.1,
+    18.6,
+    20.0,
+    19.7,
+    17.5,
+    13.7,
+    10.4,
+    8.4
+   ]
+  },
+  "Edinburgh": {
+   "sun": 1426,
+   "rain": 737,
+   "sun6190": 1348,
+   "rain6190": 652,
+   "sun_chg_pct": 5.8,
+   "class": [
+    0,
+    1
+   ],
+   "sun_m": [
+    54,
+    81,
+    115,
+    154,
+    193,
+    161,
+    166,
+    157,
+    129,
+    97,
+    72,
+    48
+   ],
+   "rain_m": [
+    65,
+    52,
+    49,
+    43,
+    50,
+    68,
+    72,
+    74,
+    56,
+    76,
+    66,
+    66
+   ],
+   "tmax_m": [
+    7.1,
+    7.8,
+    9.6,
+    12.0,
+    15.0,
+    17.5,
+    19.4,
+    19.1,
+    16.9,
+    13.2,
+    9.7,
+    7.2
+   ]
+  },
+  "Birmingham": {
+   "sun": 1475,
+   "rain": 750,
+   "sun6190": 1369,
+   "rain6190": 710,
+   "sun_chg_pct": 7.8,
+   "class": [
+    0,
+    1
+   ],
+   "sun_m": [
+    52,
+    72,
+    112,
+    148,
+    185,
+    183,
+    193,
+    175,
+    138,
+    102,
+    62,
+    52
+   ],
+   "rain_m": [
+    64,
+    52,
+    49,
+    54,
+    57,
+    71,
+    59,
+    64,
+    60,
+    72,
+    73,
+    74
+   ],
+   "tmax_m": [
+    7.3,
+    7.9,
+    10.4,
+    13.3,
+    16.6,
+    19.5,
+    21.6,
+    21.2,
+    18.4,
+    14.1,
+    10.1,
+    7.6
+   ]
+  },
+  "Brighton": {
+   "sun": 1764,
+   "rain": 782,
+   "sun6190": 1711,
+   "rain6190": 749,
+   "sun_chg_pct": 3.0,
+   "class": [
+    0,
+    2
+   ],
+   "sun_m": [
+    59,
+    82,
+    129,
+    189,
+    222,
+    224,
+    236,
+    217,
+    161,
+    118,
+    72,
+    54
+   ],
+   "rain_m": [
+    83,
+    58,
+    48,
+    45,
+    44,
+    49,
+    54,
+    60,
+    58,
+    91,
+    99,
+    92
+   ],
+   "tmax_m": [
+    8.0,
+    8.3,
+    10.3,
+    13.3,
+    16.3,
+    19.0,
+    20.9,
+    21.0,
+    18.8,
+    15.4,
+    11.5,
+    8.7
+   ]
+  },
+  "Bournemouth": {
+   "sun": 1837,
+   "rain": 877,
+   "sun6190": 1761,
+   "rain6190": 790,
+   "sun_chg_pct": 4.3,
+   "class": [
+    1,
+    2
+   ],
+   "sun_m": [
+    64,
+    88,
+    134,
+    193,
+    230,
+    237,
+    245,
+    221,
+    171,
+    120,
+    79,
+    56
+   ],
+   "rain_m": [
+    94,
+    67,
+    60,
+    58,
+    51,
+    56,
+    48,
+    60,
+    70,
+    100,
+    108,
+    105
+   ],
+   "tmax_m": [
+    8.6,
+    8.7,
+    11.0,
+    13.6,
+    16.6,
+    19.2,
+    21.3,
+    21.2,
+    18.9,
+    15.4,
+    11.7,
+    9.1
+   ]
+  },
+  "Fort William": {
+   "sun": 927,
+   "rain": 2405,
+   "sun6190": 912,
+   "rain6190": 2116,
+   "sun_chg_pct": 1.6,
+   "class": [
+    2,
+    0
+   ],
+   "sun_m": [
+    19,
+    49,
+    72,
+    121,
+    161,
+    130,
+    99,
+    105,
+    77,
+    53,
+    26,
+    15
+   ],
+   "rain_m": [
+    310,
+    232,
+    199,
+    141,
+    128,
+    119,
+    138,
+    160,
+    193,
+    257,
+    238,
+    288
+   ],
+   "tmax_m": [
+    6.5,
+    7.1,
+    8.4,
+    11.3,
+    14.3,
+    16.3,
+    17.6,
+    17.3,
+    15.0,
+    11.8,
+    8.8,
+    6.1
+   ]
+  },
+  "Aberdeen": {
+   "sun": 1518,
+   "rain": 763,
+   "sun6190": 1438,
+   "rain6190": 717,
+   "sun_chg_pct": 5.6,
+   "class": [
+    0,
+    1
+   ],
+   "sun_m": [
+    62,
+    87,
+    132,
+    159,
+    212,
+    174,
+    173,
+    168,
+    132,
+    98,
+    70,
+    52
+   ],
+   "rain_m": [
+    64,
+    55,
+    49,
+    52,
+    49,
+    61,
+    67,
+    65,
+    55,
+    91,
+    83,
+    72
+   ],
+   "tmax_m": [
+    6.9,
+    7.4,
+    9.0,
+    10.7,
+    13.2,
+    15.5,
+    17.7,
+    17.6,
+    15.8,
+    12.5,
+    9.4,
+    7.1
+   ]
+  },
+  "Swansea": {
+   "sun": 1555,
+   "rain": 1262,
+   "sun6190": 1490,
+   "rain6190": 1265,
+   "sun_chg_pct": 4.4,
+   "class": [
+    2,
+    2
+   ],
+   "sun_m": [
+    57,
+    78,
+    119,
+    168,
+    203,
+    196,
+    192,
+    177,
+    144,
+    103,
+    66,
+    52
+   ],
+   "rain_m": [
+    134,
+    96,
+    90,
+    73,
+    73,
+    75,
+    92,
+    105,
+    97,
+    138,
+    146,
+    143
+   ],
+   "tmax_m": [
+    8.4,
+    8.7,
+    10.5,
+    13.4,
+    16.4,
+    18.9,
+    20.6,
+    20.4,
+    18.3,
+    14.8,
+    11.4,
+    9.1
+   ]
+  },
+  "Plymouth": {
+   "sun": 1649,
+   "rain": 1036,
+   "sun6190": 1642,
+   "rain6190": 972,
+   "sun_chg_pct": 0.4,
+   "class": [
+    1,
+    2
+   ],
+   "sun_m": [
+    58,
+    82,
+    123,
+    180,
+    213,
+    211,
+    203,
+    189,
+    153,
+    111,
+    72,
+    53
+   ],
+   "rain_m": [
+    112,
+    86,
+    75,
+    68,
+    61,
+    63,
+    68,
+    81,
+    67,
+    113,
+    118,
+    124
+   ],
+   "tmax_m": [
+    9.0,
+    9.1,
+    10.8,
+    13.4,
+    16.2,
+    18.6,
+    20.6,
+    20.4,
+    18.4,
+    15.0,
+    11.8,
+    9.5
+   ]
+  },
+  "Norwich": {
+   "sun": 1579,
+   "rain": 666,
+   "sun6190": 1462,
+   "rain6190": 624,
+   "sun_chg_pct": 8.0,
+   "class": [
+    0,
+    2
+   ],
+   "sun_m": [
+    56,
+    76,
+    114,
+    173,
+    201,
+    187,
+    202,
+    194,
+    149,
+    108,
+    67,
+    50
+   ],
+   "rain_m": [
+    55,
+    47,
+    46,
+    39,
+    47,
+    57,
+    57,
+    64,
+    56,
+    66,
+    69,
+    62
+   ],
+   "tmax_m": [
+    7.3,
+    7.9,
+    10.3,
+    13.5,
+    16.8,
+    19.8,
+    22.5,
+    22.4,
+    19.1,
+    14.8,
+    10.7,
+    7.6
+   ]
+  }
+ },
+ "os_towns": {
+  "sunniest": [
+   {
+    "name": "Ventnor",
+    "county": "Isle of Wight",
+    "sun": 1955
+   },
+   {
+    "name": "Shanklin",
+    "county": "Isle of Wight",
+    "sun": 1942
+   },
+   {
+    "name": "Folkestone",
+    "county": "Kent",
+    "sun": 1941
+   },
+   {
+    "name": "Sandown",
+    "county": "Isle of Wight",
+    "sun": 1928
+   },
+   {
+    "name": "Fortuneswell",
+    "county": "Dorset",
+    "sun": 1923
+   }
+  ],
+  "wettest": [
+   {
+    "name": "Treherbert",
+    "county": "Rhondda Cynon Taf",
+    "rain": 2645
+   },
+   {
+    "name": "Blaenau Ffestiniog",
+    "county": "Gwynedd",
+    "rain": 2542
+   },
+   {
+    "name": "Inveraray",
+    "county": "Argyll and Bute",
+    "rain": 2468
+   },
+   {
+    "name": "Treorchy",
+    "county": "Rhondda Cynon Taf",
+    "rain": 2453
+   },
+   {
+    "name": "Pontycymer",
+    "county": "Bridgend",
+    "rain": 2348
+   }
+  ],
+  "driest": [
+   {
+    "name": "Southend-on-Sea",
+    "county": "Southend-on-Sea",
+    "rain": 526
+   },
+   {
+    "name": "Burnham-on-Crouch",
+    "county": "Essex",
+    "rain": 528
+   },
+   {
+    "name": "Rochford",
+    "county": "Essex",
+    "rain": 530
+   },
+   {
+    "name": "Brightlingsea",
+    "county": "Essex",
+    "rain": 532
+   },
+   {
+    "name": "Canvey Island",
+    "county": "Essex",
+    "rain": 533
+   }
+  ],
+  "dullest": [
+   {
+    "name": "Fort William",
+    "county": "Highland",
+    "sun": 947
+   },
+   {
+    "name": "Kingussie",
+    "county": "Highland",
+    "sun": 1119
+   },
+   {
+    "name": "Moffat",
+    "county": "Dumfries and Galloway",
+    "sun": 1138
+   },
+   {
+    "name": "Inveraray",
+    "county": "Argyll and Bute",
+    "sun": 1151
+   },
+   {
+    "name": "Sanquhar",
+    "county": "Dumfries and Galloway",
+    "sun": 1156
+   }
+  ]
+ },
+ "change": {
+  "share_sunnier": 0.917,
+  "share_sunnier5": 0.544,
+  "share_duller": 0.083,
+  "share_wetter": 0.985,
+  "share_wetter5": 0.692,
+  "share_drier": 0.015,
+  "sun_pct_p10": 0.5,
+  "sun_pct_p90": 10.8,
+  "sun_pct_max": 18.8,
+  "sun_pct_min": -6.4,
+  "rain_pct_p10": 2.8,
+  "rain_pct_p90": 11.1,
+  "sunnier_and_wetter": 0.903,
+  "sunnier_and_drier": 0.014,
+  "duller_and_wetter": 0.082,
+  "duller_and_drier": 0.001,
+  "rho_change": -0.32,
+  "max_cell": {
+   "near": "Knock",
+   "county": "Westmorland and Furness",
+   "km": 6.4,
+   "e_km": 371.5,
+   "n_km": 532.5,
+   "region": "North West",
+   "pct": 18.8
+  },
+  "min_cell": {
+   "near": "Poolewe",
+   "county": "Highland",
+   "km": 2.7,
+   "e_km": 185.5,
+   "n_km": 883.5,
+   "region": "Scotland",
+   "pct": -6.4
+  },
+  "area_over_1500": [
+   40442,
+   95245
+  ],
+  "area_over_1600": [
+   9881,
+   42725
+  ],
+  "area_over_1700": [
+   2056,
+   10426
+  ],
+  "by_northing": [
+   {
+    "n_from": 0,
+    "n_to": 100,
+    "km2": 8976,
+    "sun_chg_pct": 3.1,
+    "rain_chg_pct": 6.6,
+    "sun": 1641.0
+   },
+   {
+    "n_from": 100,
+    "n_to": 200,
+    "km2": 33773,
+    "sun_chg_pct": 6.5,
+    "rain_chg_pct": 6.4,
+    "sun": 1628.0
+   },
+   {
+    "n_from": 200,
+    "n_to": 300,
+    "km2": 41377,
+    "sun_chg_pct": 7.4,
+    "rain_chg_pct": 6.1,
+    "sun": 1530.0
+   },
+   {
+    "n_from": 300,
+    "n_to": 400,
+    "km2": 33047,
+    "sun_chg_pct": 7.4,
+    "rain_chg_pct": 5.0,
+    "sun": 1482.0
+   },
+   {
+    "n_from": 400,
+    "n_to": 500,
+    "km2": 22049,
+    "sun_chg_pct": 6.9,
+    "rain_chg_pct": 5.1,
+    "sun": 1407.0
+   },
+   {
+    "n_from": 500,
+    "n_to": 600,
+    "km2": 31652,
+    "sun_chg_pct": 4.3,
+    "rain_chg_pct": 7.9,
+    "sun": 1320.0
+   },
+   {
+    "n_from": 600,
+    "n_to": 700,
+    "km2": 20433,
+    "sun_chg_pct": 3.1,
+    "rain_chg_pct": 9.9,
+    "sun": 1299.0
+   },
+   {
+    "n_from": 700,
+    "n_to": 800,
+    "km2": 20907,
+    "sun_chg_pct": 2.8,
+    "rain_chg_pct": 10.4,
+    "sun": 1175.0
+   },
+   {
+    "n_from": 800,
+    "n_to": 900,
+    "km2": 21006,
+    "sun_chg_pct": 3.8,
+    "rain_chg_pct": 7.4,
+    "sun": 1162.0
+   },
+   {
+    "n_from": 900,
+    "n_to": 1000,
+    "km2": 9598,
+    "sun_chg_pct": 5.1,
+    "rain_chg_pct": 6.2,
+    "sun": 1132.0
+   },
+   {
+    "n_from": 1000,
+    "n_to": 1100,
+    "km2": 814,
+    "sun_chg_pct": 7.2,
+    "rain_chg_pct": 4.3,
+    "sun": 1213.0
+   },
+   {
+    "n_from": 1100,
+    "n_to": 1200,
+    "km2": 1294,
+    "sun_chg_pct": 9.0,
+    "rain_chg_pct": 2.2,
+    "sun": 1110.0
+   }
+  ],
+  "top_sun_class_area": [
+   26992,
+   81886
+  ],
+  "breaks_6190": {
+   "sun3": [
+    1255.0,
+    1424.0
+   ],
+   "rain3": [
+    767.0,
+    1153.0
+   ]
+  }
+ },
+ "coast": {
+  "bands": [
+   {
+    "from_km": 0,
+    "to_km": 2,
+    "km2": 19140,
+    "sun": 1418.0,
+    "rain": 1277.0
+   },
+   {
+    "from_km": 2,
+    "to_km": 5,
+    "km2": 24233,
+    "sun": 1410.0,
+    "rain": 1340.0
+   },
+   {
+    "from_km": 5,
+    "to_km": 10,
+    "km2": 25465,
+    "sun": 1413.0,
+    "rain": 1300.0
+   },
+   {
+    "from_km": 10,
+    "to_km": 20,
+    "km2": 39919,
+    "sun": 1404.0,
+    "rain": 1267.0
+   },
+   {
+    "from_km": 20,
+    "to_km": 40,
+    "km2": 59012,
+    "sun": 1394.0,
+    "rain": 1176.0
+   },
+   {
+    "from_km": 40,
+    "to_km": 80,
+    "km2": 54713,
+    "sun": 1419.0,
+    "rain": 961.0
+   },
+   {
+    "from_km": 80,
+    "to_km": 200,
+    "km2": 8269,
+    "sun": 1516.0,
+    "rain": 702.0
+   }
+  ],
+  "sun_coast2": 1418.0,
+  "sun_inland20": 1413.0,
+  "coast_premium_pct": 0.3,
+  "top1_within5": 0.798,
+  "land_within5": 0.188,
+  "top5_within5": 0.487,
+  "top1_regions": [
+   {
+    "region": "South East",
+    "share": 0.821
+   },
+   {
+    "region": "South West",
+    "share": 0.121
+   },
+   {
+    "region": "East of England",
+    "share": 0.058
+   }
+  ],
+  "top1_threshold": 1797.0,
+  "by_nation": {
+   "England": {
+    "coast2": 1684.0,
+    "inland20": 1505.0
+   },
+   "Scotland": {
+    "coast2": 1260.0,
+    "inland20": 1173.0
+   },
+   "Wales": {
+    "coast2": 1578.0,
+    "inland20": 1331.0
+   }
+  },
+  "bands_nation": {
+   "England": [
+    1684.0,
+    1645.0,
+    1596.0,
+    1557.0,
+    1520.0,
+    1491.0,
+    1516.0
+   ],
+   "Scotland": [
+    1260.0,
+    1227.0,
+    1205.0,
+    1196.0,
+    1186.0,
+    1148.0,
+    null
+   ],
+   "Wales": [
+    1578.0,
+    1525.0,
+    1460.0,
+    1402.0,
+    1329.0,
+    1336.0,
+    null
+   ]
+  }
+ },
+ "months": [
+  {
+   "month": "January",
+   "sun": 47.0,
+   "rain": 121.0,
+   "tmax": 6.7,
+   "sun_England": 55.0,
+   "sun_Scotland": 35.0,
+   "sun_Wales": 47.0,
+   "sun_Northern Ireland": 43.0,
+   "rain_England": 83.0,
+   "rain_Scotland": 177.0,
+   "rain_Wales": 154.0,
+   "rain_Northern Ireland": 115.0
+  },
+  {
+   "month": "February",
+   "sun": 72.0,
+   "rain": 96.0,
+   "tmax": 7.2,
+   "sun_England": 78.0,
+   "sun_Scotland": 64.0,
+   "sun_Wales": 69.0,
+   "sun_Northern Ireland": 67.0,
+   "rain_England": 66.0,
+   "rain_Scotland": 140.0,
+   "rain_Wales": 120.0,
+   "rain_Northern Ireland": 91.0
+  },
+  {
+   "month": "March",
+   "sun": 109.0,
+   "rain": 85.0,
+   "tmax": 9.2,
+   "sun_England": 117.0,
+   "sun_Scotland": 98.0,
+   "sun_Wales": 110.0,
+   "sun_Northern Ireland": 101.0,
+   "rain_England": 58.0,
+   "rain_Scotland": 124.0,
+   "rain_Wales": 103.0,
+   "rain_Northern Ireland": 87.0
+  },
+  {
+   "month": "April",
+   "sun": 155.0,
+   "rain": 72.0,
+   "tmax": 12.0,
+   "sun_England": 164.0,
+   "sun_Scotland": 142.0,
+   "sun_Wales": 158.0,
+   "sun_Northern Ireland": 148.0,
+   "rain_England": 56.0,
+   "rain_Scotland": 93.0,
+   "rain_Wales": 88.0,
+   "rain_Northern Ireland": 74.0
+  },
+  {
+   "month": "May",
+   "sun": 192.0,
+   "rain": 71.0,
+   "tmax": 15.1,
+   "sun_England": 199.0,
+   "sun_Scotland": 183.0,
+   "sun_Wales": 191.0,
+   "sun_Northern Ireland": 184.0,
+   "rain_England": 57.0,
+   "rain_Scotland": 89.0,
+   "rain_Wales": 87.0,
+   "rain_Northern Ireland": 74.0
+  },
+  {
+   "month": "June",
+   "sun": 172.0,
+   "rain": 77.0,
+   "tmax": 17.7,
+   "sun_England": 188.0,
+   "sun_Scotland": 147.0,
+   "sun_Wales": 178.0,
+   "sun_Northern Ireland": 151.0,
+   "rain_England": 65.0,
+   "rain_Scotland": 93.0,
+   "rain_Wales": 92.0,
+   "rain_Northern Ireland": 81.0
+  },
+  {
+   "month": "July",
+   "sun": 173.0,
+   "rain": 82.0,
+   "tmax": 19.6,
+   "sun_England": 197.0,
+   "sun_Scotland": 141.0,
+   "sun_Wales": 177.0,
+   "sun_Northern Ireland": 137.0,
+   "rain_England": 66.0,
+   "rain_Scotland": 103.0,
+   "rain_Wales": 98.0,
+   "rain_Northern Ireland": 89.0
+  },
+  {
+   "month": "August",
+   "sun": 162.0,
+   "rain": 94.0,
+   "tmax": 19.3,
+   "sun_England": 181.0,
+   "sun_Scotland": 135.0,
+   "sun_Wales": 160.0,
+   "sun_Northern Ireland": 137.0,
+   "rain_England": 75.0,
+   "rain_Scotland": 120.0,
+   "rain_Wales": 111.0,
+   "rain_Northern Ireland": 99.0
+  },
+  {
+   "month": "September",
+   "sun": 128.0,
+   "rain": 91.0,
+   "tmax": 16.8,
+   "sun_England": 141.0,
+   "sun_Scotland": 107.0,
+   "sun_Wales": 130.0,
+   "sun_Northern Ireland": 113.0,
+   "rain_England": 68.0,
+   "rain_Scotland": 123.0,
+   "rain_Wales": 111.0,
+   "rain_Northern Ireland": 87.0
+  },
+  {
+   "month": "October",
+   "sun": 92.0,
+   "rain": 123.0,
+   "tmax": 13.1,
+   "sun_England": 103.0,
+   "sun_Scotland": 75.0,
+   "sun_Wales": 92.0,
+   "sun_Northern Ireland": 86.0,
+   "rain_England": 90.0,
+   "rain_Scotland": 168.0,
+   "rain_Wales": 158.0,
+   "rain_Northern Ireland": 114.0
+  },
+  {
+   "month": "November",
+   "sun": 58.0,
+   "rain": 123.0,
+   "tmax": 9.4,
+   "sun_England": 65.0,
+   "sun_Scotland": 48.0,
+   "sun_Wales": 55.0,
+   "sun_Northern Ireland": 55.0,
+   "rain_England": 92.0,
+   "rain_Scotland": 165.0,
+   "rain_Wales": 162.0,
+   "rain_Northern Ireland": 122.0
+  },
+  {
+   "month": "December",
+   "sun": 43.0,
+   "rain": 127.0,
+   "tmax": 7.0,
+   "sun_England": 51.0,
+   "sun_Scotland": 30.0,
+   "sun_Wales": 41.0,
+   "sun_Northern Ireland": 38.0,
+   "rain_England": 92.0,
+   "rain_Scotland": 174.0,
+   "rain_Wales": 175.0,
+   "rain_Northern Ireland": 121.0
+  }
+ ],
+ "month_stats": {
+  "sunniest_month_uk": "May",
+  "dullest_month_uk": "December",
+  "wettest_month_uk": "December",
+  "driest_month_uk": "May",
+  "sunniest_month_share": {
+   "May": 0.722,
+   "June": 0.004,
+   "July": 0.273,
+   "August": 0.0
+  },
+  "wettest_month_share": {
+   "January": 0.149,
+   "February": 0.001,
+   "May": 0.0,
+   "June": 0.014,
+   "July": 0.011,
+   "August": 0.044,
+   "September": 0.0,
+   "October": 0.263,
+   "November": 0.236,
+   "December": 0.282
+  },
+  "driest_month_share": {
+   "January": 0.0,
+   "February": 0.029,
+   "March": 0.251,
+   "April": 0.246,
+   "May": 0.304,
+   "June": 0.118,
+   "July": 0.05,
+   "August": 0.001,
+   "September": 0.001,
+   "October": 0.0,
+   "December": 0.0
+  },
+  "dec_sun_max": 67.0,
+  "dec_sun_min": 9.0,
+  "jun_sun_max": 253.0,
+  "jun_sun_min": 106.0,
+  "dec_dullest": {
+   "near": "North Roe",
+   "county": "Shetland Islands",
+   "km": 5.7,
+   "e_km": 431.5,
+   "n_km": 1191.5,
+   "region": "Scotland",
+   "sun": 9.0
+  },
+  "dec_sunniest": {
+   "near": "Ventnor",
+   "county": "Isle of Wight",
+   "km": 1.0,
+   "e_km": 456.5,
+   "n_km": 78.5,
+   "region": "South East",
+   "sun": 67.0
+  },
+  "jun_sunniest": {
+   "near": "Dungeness",
+   "county": "Kent",
+   "km": 0.3,
+   "e_km": 609.5,
+   "n_km": 117.5,
+   "region": "South East",
+   "sun": 253.0
+  }
+ },
+ "seasons": {
+  "winter": {
+   "sun": 162.0,
+   "rain": 345.0,
+   "sun_max": 236.0,
+   "sun_min": 60.0,
+   "rain_max": 1532.0,
+   "rain_min": 100.0,
+   "rho": -0.79
+  },
+  "spring": {
+   "sun": 457.0,
+   "rain": 228.0,
+   "sun_max": 602.0,
+   "sun_min": 304.0,
+   "rain_max": 895.0,
+   "rain_min": 90.0,
+   "rho": -0.67
+  },
+  "summer": {
+   "sun": 507.0,
+   "rain": 253.0,
+   "sun_max": 766.0,
+   "sun_min": 281.0,
+   "rain_max": 997.0,
+   "rain_min": 118.0,
+   "rho": -0.76
+  },
+  "autumn": {
+   "sun": 277.0,
+   "rain": 337.0,
+   "sun_max": 399.0,
+   "sun_min": 127.0,
+   "rain_max": 1432.0,
+   "rain_min": 129.0,
+   "rho": -0.73
+  },
+  "winter_rain_share": 0.297,
+  "summer_sun_share": 0.361,
+  "winter_share_dry_tercile": 0.25,
+  "winter_share_wet_tercile": 0.317
+ },
+ "pleasant": {
+  "18_27": {
+   "hist": [
+    61822,
+    11899,
+    55885,
+    25688,
+    88410,
+    1373,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "share_zero": 0.252,
+   "max": 5,
+   "mean": 2.29
+  },
+  "20_27": {
+   "hist": [
+    135751,
+    7731,
+    70454,
+    30277,
+    864,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "share_zero": 0.554,
+   "max": 4,
+   "mean": 0.99
+  },
+  "15_25": {
+   "hist": [
+    6648,
+    2870,
+    16543,
+    21460,
+    59288,
+    108610,
+    29313,
+    345,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "share_zero": 0.027,
+   "max": 7,
+   "mean": 4.32
+  },
+  "16_27": {
+   "hist": [
+    15577,
+    5002,
+    31836,
+    30165,
+    68772,
+    93594,
+    131,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "share_zero": 0.064,
+   "max": 6,
+   "mean": 3.68
+  },
+  "tmax_july_max": 23.9,
+  "tmax_july_min": 9.5,
+  "warmest_july": {
+   "near": "London",
+   "county": "Greater London",
+   "km": 3.2,
+   "e_km": 529.5,
+   "n_km": 183.5,
+   "region": "London",
+   "tmax": 23.9
+  },
+  "london_months_18": 5
+ }
+}
