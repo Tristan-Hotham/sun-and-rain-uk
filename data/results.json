@@ -2401,7 +2401,7 @@
    {
     "name": "Folkestone",
     "county": "Kent",
-    "sun": 1941
+    "sun": 1937
    },
    {
     "name": "Sandown",
@@ -2436,9 +2436,9 @@
     "rain": 2453
    },
    {
-    "name": "Pontycymer",
-    "county": "Bridgend",
-    "rain": 2348
+    "name": "Fort William",
+    "county": "Highland",
+    "rain": 2405
    }
   ],
   "driest": [
@@ -2472,7 +2472,7 @@
    {
     "name": "Fort William",
     "county": "Highland",
-    "sun": 947
+    "sun": 927
    },
    {
     "name": "Kingussie",
