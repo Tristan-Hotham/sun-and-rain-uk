@@ -162,7 +162,16 @@ rows_out = []
 for _, r in gn.iterrows():
     rows_out.append({"name": r["name"], "source": "GeoNames", "kind": "Town 15,000+", "county": "", "population": int(r["pop"]),
                      "lat": round(r.lat, 5), "lon": round(r.lon, 5), "e": round(r.x), "n": round(r.y), **at(r.x, r.y)})
-ost = osn[(osn.type == "populatedPlace") & osn.local_type.isin(["City", "Town"])]
+ost = osn[(osn.type == "populatedPlace") & osn.local_type.isin(["City", "Town"])].copy()
+# one point per town: an OS city or town with the same name as a GeoNames town (Great Britain) within 5 km takes the
+# GeoNames point, so the town has one figure in both lists, in towns.csv and in the page's search
+ost["moved"] = False
+for g in gn[gn.a1 != "NIR"].itertuples():
+    c = ost[(ost.show == g.name) & ~ost.moved]
+    if not len(c): continue
+    d = np.hypot(c.x - g.x, c.y - g.y)
+    if d.min() <= 5000:
+        k = d.idxmin(); ost.loc[k, ["x", "y", "lat", "lon"]] = [g.x, g.y, g.lat, g.lon]; ost.loc[k, "moved"] = True
 for _, r in ost.iterrows():
     rows_out.append({"name": r.show, "source": "OS Open Names", "kind": r.local_type, "county": r.cty, "population": None,
                      "lat": r.lat, "lon": r.lon, "e": round(r.x), "n": round(r.y), **at(r.x, r.y)})
@@ -183,7 +192,8 @@ json.dump({"cols": ["name", "county", "big", "pop", "e_km", "n_km", "region", "s
            "rows": P}, open(os.path.join(ROOT, "data", "towns_page.json"), "w"), separators=(",", ":"), ensure_ascii=False)
 
 # place search list: OS cities, towns, villages (GB) and GeoNames Northern Ireland towns
-S = osn[(osn.type == "populatedPlace") & osn.local_type.isin(["City", "Town", "Village"])]
+S = osn[(osn.type == "populatedPlace") & osn.local_type.isin(["City", "Town", "Village"])].copy()
+S.loc[ost.index, ["x", "y"]] = ost[["x", "y"]]  # towns at their GeoNames point, as in the town table
 srch = [[r.show, r.cty, round(r.x / 1000, 2), round(r.y / 1000, 2), {"City": 2, "Town": 1, "Village": 0}[r.local_type]] + ([r.alt] if r.alt else []) for r in S.itertuples()]
 for r in gn[gn.a1 == "NIR"].itertuples():
     srch.append([r.name, "Northern Ireland", round(r.x / 1000, 2), round(r.y / 1000, 2), 1])
