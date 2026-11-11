@@ -50,7 +50,8 @@ Every number is in `data/results.json`, which the page, paper, blog and collage 
 
 - **Data.** HadUK-Grid v1.3.2.ceda 1 km thirty-year averages: annual sunshine hours and rainfall for 1961 to 1990 and 1991 to 2020; monthly sunshine, rainfall and mean daily maximum temperature for 1991 to 2020. 245,077 land squares on the British National Grid.
 - **Classes.** Terciles of the land (each square one km²) for each measure, crossed into nine classes (quartiles and sixteen classes as an option on the page). For 1991 to 2020 the breaks are 1,310 and 1,526 hours, and 817 and 1,231 mm. Then and now uses the 1991 to 2020 breaks for both periods.
-- **Places.** Regions from the nearest OS Open Names place; Northern Ireland is the land block containing Belfast. Towns take the mean of the land squares in the 3 km block around their point (GeoNames places of 15,000 or more, excluding sections of other places; OS Open Names cities and towns).
+- **Places.** Regions from the nearest OS Open Names place; Northern Ireland is the land block containing Belfast. Towns take the mean of the land squares in the 3 km block around their point (GeoNames places of 15,000 or more, excluding sections of other places; OS Open Names cities and towns). Where a GeoNames town and an OS Open Names city or town share a name within 5 km, both use the GeoNames point, so each town has one figure.
+- **Two measures (and a third, coarser one).** A *town figure* is the 3 km block mean above: it is what the rankings, `towns.csv`, `towns_page.json` and `results.json` give, and what the page's search shows when you pick a town. A *square figure* is the value of the single 1 km square a point falls in: the page's search shows it for villages, postcodes and your location, and gives the town's centre square alongside the town figure. The two can differ by a few per cent, more in hilly places (York: 649 mm as a town; 660 mm in its centre square). `cells_5km.csv` is a third product, the mean of each 5 km square, for reuse at coarse scale, not a town figure.
 - **Coast.** Distance from each square's centre to the nearest non-land cell, Great Britain only.
 - **Page encoding.** Annual sunshine in 6 hour steps, rainfall on a log scale (under 1% error), monthly sunshine in 1.2 hour steps, temperature in eighths of a degree. Text numbers come from the full-precision data.
 
@@ -58,7 +59,7 @@ Every number is in `data/results.json`, which the page, paper, blog and collage 
 
 - HadUK-Grid interpolates between stations with geographic predictors; values in remote hills rest on few stations and are model estimates.
 - Sunshine instruments and the station network changed between the periods, so part of the change may be instrumental; the change map shows round patches centred on single stations.
-- Thirty-year averages hide year-to-year variability. Town values are for a 3 km block around a point. GeoNames populations are approximate and of mixed date.
+- Thirty-year averages hide year-to-year variability. Town values are for a 3 km block around a point (see Two measures above). GeoNames populations are approximate and of mixed date.
 
 ## How to rerun
 

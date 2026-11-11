@@ -297,14 +297,14 @@ footer p{margin:0 0 10px}
   </div>
   <div class="fig-sub" id="rkSub"></div>
   <div class="tablewrap"><table class="t" id="rkt"></table></div>
-  <div class="src">Each town takes the average of the land squares in the 3 km by 3 km block around its point in GeoNames or OS Open Names, so a town's figure is its centre, not its edges. The ranking follows the map's "When" menu: pick a month or season there to rank by it. "Most brightened" compares 1991 to 2020 with 1961 to 1990.</div>
+  <div class="src">Each town takes the average of the land squares in the 3 km by 3 km block around its point in GeoNames or OS Open Names, so a town's figure is its centre, not its edges. Searching for a town shows this same town figure; other places and postcodes show their single 1 km square. The ranking follows the map's "When" menu: pick a month or season there to rank by it. "Most brightened" compares 1991 to 2020 with 1961 to 1990.</div>
 </div>
 
 <div class="note" id="method">
   <h3>How I did this</h3>
   <p><b>Data.</b> The Met Office's HadUK-Grid (version 1.3.2) interpolates observations from the UK's weather stations onto a 1 km grid on the British National Grid, using regression on geography (height, distance from the coast, urban land and so on) and smoothing of the leftovers between stations. I used its thirty-year averages: annual sunshine hours and rainfall for 1961 to 1990 and 1991 to 2020, and monthly sunshine, rainfall and mean daily maximum temperature for 1991 to 2020. There are 245,077 land squares. HadUK-Grid is published by the Met Office through the Centre for Environmental Data Analysis under the Open Government Licence.</p>
   <p><b>Classes.</b> By default the breaks are the terciles (3 by 3) or quartiles (4 by 4) of the squares, each square counting as one square kilometre, so every row and column of the key covers the same land area; you can set them yourself instead. The colours are my own, mixed from four corners in a perceptual colour space. For "What changed", the classes are of percentage change.</p>
-  <p><b>Places.</b> Towns are GeoNames places with 15,000 or more people (not counting parts of other places) and the cities and towns of OS Open Names; each takes the mean of the land squares within its 3 km block. Regions come from the nearest OS Open Names place; Northern Ireland is its own land area on the grid. Distances from the sea are measured from the grid's coastline.</p>
+  <p><b>Places.</b> Towns are GeoNames places with 15,000 or more people (not counting parts of other places) and the cities and towns of OS Open Names; each takes the mean of the land squares within its 3 km block. Where a GeoNames town and an OS Open Names town share a name within 5 km, both use the GeoNames point, so each town has one figure. That town figure is one of two measures on this page: searching for a town shows its town figure, as in the rankings and towns.csv, while a village, a postcode or your location shows the single 1 km square it falls in, which can differ from the town figure by a few per cent (more in hilly places). The 5 km table in the data is a third, coarser product: the mean of each 5 km square. Regions come from the nearest OS Open Names place; Northern Ireland is its own land area on the grid. Distances from the sea are measured from the grid's coastline.</p>
   <p><b>Limits.</b> These are averages over thirty years, not any one year, and a grid is a model of the weather between stations, not a measurement in every square: values in remote hills rest on few stations, and the hilltop figures are estimates. Sunshine recorders changed over the decades (from the glass-ball Campbell-Stokes recorder to electronic sensors), and the station network changed too, so part of the change between the two periods may come from the instruments. The page stores values in a compressed form, so the figures it shows are rounded slightly; every number quoted in the text comes from the full-resolution data.</p>
 </div>
 <div class="cta">
@@ -769,8 +769,13 @@ async function choose(pl, fly = true) {
   if (lmap) { if (pin) pin.remove(); const [e, n] = enOf(p); pin = L.marker(ll(e, n), { icon: L.divIcon({ className: "", html: '<div class="pin"></div>', iconSize: [18, 18], iconAnchor: [9, 9] }), interactive: false }).addTo(lmap); if (fly) lmap.setView(ll(e, n), Math.max(lmap.getZoom(), 1.5)); }
   ans.innerHTML = '<div class="pn">Loading the monthly grids...</div>';
   await loadMonths();
-  const sA = D.sunA[p], rA = D.rainA[p], s6 = D.sun6[p], r6 = D.rain6[p];
-  const sm = MON.map((_, m) => D.sunM[m][p]), rm = MON.map((_, m) => D.rainM[m][p]), tm = MON.map((_, m) => D.tmaxM[m][p]);
+  // two measures: a town in the rankings shows its town figure (mean of the 3 km block around its point, as in the
+  // rankings and towns.csv); any other place or postcode shows its single 1 km square
+  const tw = pl.how === "place" && TOWNS ? TOWNS.filter(r => r[0] === pl.name && Math.hypot(r[4] - pl.e, r[5] - pl.n) < 0.2).sort((a, b) => b[2] - a[2])[0] : null;
+  const qS = D.sunA[p], qR = D.rainA[p];
+  let sA = qS, rA = qR, s6 = D.sun6[p], r6 = D.rain6[p];
+  let sm = MON.map((_, m) => D.sunM[m][p]), rm = MON.map((_, m) => D.rainM[m][p]), tm = MON.map((_, m) => D.tmaxM[m][p]);
+  if (tw) { [sA, rA, s6, r6] = tw.slice(7, 11); sm = tw.slice(11, 23); rm = tw.slice(23, 35); tm = tw.slice(35, 47); }
   const ps = pctile(D.sunA, sA), pr = pctile(D.rainA, rA);
   const b3 = { x: R.breaks.sun3, y: R.breaks.rain3 }, r3 = cls(rA, b3.y), s3 = cls(sA, b3.x);
   const word = ["dull and dry", "", "sunny and dry", "", "", "", "dull and wet", "", "sunny and wet"][r3 * 3 + s3] || ((s3 === 1 ? "middling sun" : s3 === 0 ? "dull" : "sunny") + ", " + (r3 === 1 ? "middling rain" : r3 === 0 ? "dry" : "wet"));
@@ -778,7 +783,7 @@ async function choose(pl, fly = true) {
   const [e, n] = enOf(p);
   const reg = REG[D.reg[p] - 1];
   ans.innerHTML = `<div class="big">${esc(pl.name)}: <em style="color:${R.palette[3][r3][s3]};${r3 === 0 && s3 === 0 ? "background:var(--fg);padding:0 4px" : ""}">${word}</em></div>
-  <div class="pn">${pl.sub ? esc(pl.sub) + " · " : ""}${reg} · 1 km square at grid reference ${Math.floor(e)} km E, ${Math.floor(n)} km N${pxOf(pl.e, pl.n) === p ? "" : " (nearest land square)"}</div>
+  <div class="pn">${pl.sub ? esc(pl.sub) + " · " : ""}${reg} · ${tw ? "<b>Town figure</b>: the mean of the 1 km squares in the 3 km by 3 km block around the town's centre, the same figure as in the rankings and towns.csv. Its centre square alone" : "<b>Single 1 km square</b>"} at grid reference ${Math.floor(e)} km E, ${Math.floor(n)} km N${pxOf(pl.e, pl.n) === p ? "" : " (nearest land square)"}${tw ? ` has ${fmt(qS)} hours and ${fmt(qR)} mm.` : ""}</div>
   <div class="kv"><div><b style="color:var(--sun)">${fmt(sA)}</b>hours of sun a year, ${rankTxt(ps, "sunnier", "sunniest")}</div><div><b style="color:var(--rain)">${fmt(rA)}</b>mm of rain a year, ${rankTxt(pr, "wetter", "wettest")}</div>
   <div><b>${(sA / s6 - 1) >= 0 ? "+" : ""}${((sA / s6 - 1) * 100).toFixed(1)}%</b>sunshine since 1961 to 1990 (${fmt(s6)} h then)</div><div><b>${(rA / r6 - 1) >= 0 ? "+" : ""}${((rA / r6 - 1) * 100).toFixed(1)}%</b>rainfall since 1961 to 1990 (${fmt(r6)} mm then)</div></div>
   <div class="chart" id="sqChart"></div>
