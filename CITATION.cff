@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this data or code, please cite it as below."
+title: "Sun and Rain: The United Kingdom's Sunshine Against Its Rainfall at 1 km, 1961 to 2020"
+type: dataset
+authors:
+  - family-names: Hotham
+    given-names: Tristan
+    orcid: "https://orcid.org/0000-0003-4931-9349"
+    affiliation: "Independent researcher"
+doi: "10.5281/zenodo.23732582"
+url: "https://maps.tristanhotham.com/sun-and-rain-uk/"
+repository-code: "https://github.com/Tristan-Hotham/sun-and-rain-uk"
+license: CC-BY-4.0
+keywords:
+  - "sunshine"
+  - "rainfall"
+  - "climate normals"
+  - "HadUK-Grid"
+  - "bivariate map"
+  - "United Kingdom"
+  - "brightening"
+  - "coastal climate"
+  - "Met Office"
+  - "open data"
